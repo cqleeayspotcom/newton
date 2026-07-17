@@ -14,9 +14,12 @@ import { PoseEngine } from '../pose/pose-engine';
 import { RateMeter } from '../pose/rate-meter';
 import { AnalysisStore } from '../analysis/analysis-store';
 import {
+  buildReferenceGhost,
   computeMetrics,
   deriveFindings,
+  ghostSegments,
   type Finding,
+  type GhostSkeleton,
   type PostureMetrics,
 } from '../analysis/posture-metrics';
 
@@ -56,6 +59,15 @@ export class Capture implements OnDestroy {
   protected readonly liveFindings = signal<Finding[]>([]);
   protected readonly hasPerson = signal(false);
   private lastMetrics: PostureMetrics | null = null;
+
+  /**
+   * F071 — true when a dimmed reference-posture "ghost" (ideal: level shoulders
+   * + level hips + vertical spine/head) is being drawn next to the detected
+   * skeleton. `ghostSegmentCount` is the debug hook for the number of ghost
+   * bones rendered on the latest frame.
+   */
+  protected readonly ghostActive = signal(false);
+  protected readonly ghostSegmentCount = signal(0);
 
   /** F034 — MediaPipe model-loading lifecycle, surfaced to the template. */
   protected readonly poseState = this.poseEngine.state;
@@ -243,7 +255,15 @@ export class Capture implements OnDestroy {
     landmarks: { x: number; y: number; visibility?: number }[] | null,
   ): void {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if (!landmarks || landmarks.length === 0) return;
+    if (!landmarks || landmarks.length === 0) {
+      this.ghostActive.set(false);
+      this.ghostSegmentCount.set(0);
+      return;
+    }
+
+    // F071 — draw the dimmed ideal-posture ghost UNDER the detected skeleton so
+    // the real (solid) skeleton reads on top of it.
+    this.drawGhost(ctx, canvas, buildReferenceGhost(landmarks));
 
     const px = (n: number, size: number) => n * size;
 
@@ -267,6 +287,61 @@ export class Capture implements OnDestroy {
       ctx.arc(px(lm.x, canvas.width), px(lm.y, canvas.height), r, 0, Math.PI * 2);
       ctx.fill();
     }
+  }
+
+  /**
+   * F071 — draw the reference-posture ghost: a dimmed, dashed, translucent
+   * stick figure with LEVEL shoulders + LEVEL hips + a VERTICAL spine/head,
+   * so the user can see their detected posture against the ideal.
+   */
+  private drawGhost(
+    ctx: CanvasRenderingContext2D,
+    canvas: HTMLCanvasElement,
+    ghost: GhostSkeleton | null,
+  ): void {
+    if (!ghost) {
+      this.ghostActive.set(false);
+      this.ghostSegmentCount.set(0);
+      return;
+    }
+
+    const px = (n: number, size: number) => n * size;
+    const segs = ghostSegments(ghost);
+
+    ctx.save();
+    ctx.lineWidth = Math.max(3, canvas.width / 170);
+    // Emerald "target" ghost: dashed + translucent so it reads as the IDEAL
+    // reference, clearly distinct from the solid orange/blue detected skeleton.
+    ctx.strokeStyle = 'rgba(52, 211, 153, 0.85)'; // emerald
+    ctx.shadowColor = 'rgba(16, 185, 129, 0.9)';
+    ctx.shadowBlur = Math.max(4, canvas.width / 90);
+    ctx.setLineDash([Math.max(5, canvas.width / 45), Math.max(4, canvas.width / 80)]);
+    for (const [a, b] of segs) {
+      ctx.beginPath();
+      ctx.moveTo(px(a.x, canvas.width), px(a.y, canvas.height));
+      ctx.lineTo(px(b.x, canvas.width), px(b.y, canvas.height));
+      ctx.stroke();
+    }
+
+    // Hollow ghost joints at the key points (visually distinct from the solid
+    // orange detected joints).
+    ctx.setLineDash([]);
+    const r = Math.max(3, canvas.width / 130);
+    for (const p of [
+      ghost.leftShoulder,
+      ghost.rightShoulder,
+      ghost.leftHip,
+      ghost.rightHip,
+      ghost.nose,
+    ]) {
+      ctx.beginPath();
+      ctx.arc(px(p.x, canvas.width), px(p.y, canvas.height), r, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    this.ghostActive.set(true);
+    this.ghostSegmentCount.set(segs.length);
   }
 
   /** Snapshot the current analysis and move to the insole recommendation. */

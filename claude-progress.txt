@@ -485,3 +485,54 @@ NEXT, in this order, CLIENT-SIDE (extend analysis/ capture/ insole/):
     tools/stl_check.js), F099 (mirrored right).
 THEN resume daemon polish F197–F210.
 Verify each in-browser with tools/test_media/person.y4m + screenshot.
+
+-------------------------------------------------------------------------------
+SESSION 010 — F071 (reference-comparison)  ·  2026-07-17  ·  model: claude-opus-4-8
+-------------------------------------------------------------------------------
+FEATURE: F071 — the capture overlay draws a dimmed reference-posture "ghost"
+skeleton (IDEAL: level shoulders + level hips + vertical spine/head) next to the
+user's detected skeleton. First of the HACKATHON DELIVERY track (ghost overlay →
+3D insole → STL); the ghost is the visual anchor F074 (highlight deviating
+segments) + F073 (toggle) build on next.
+
+WORK (client-side only; extends analysis/ + capture/):
+- frontend/src/app/analysis/posture-metrics.ts: new pure, unit-testable
+  buildReferenceGhost(landmarks) — anchors to the user's own shoulder/hip midline
+  and keeps their scale + vertical span, but CORRECTS the posture: both shoulders
+  to one y (level), both hips to one y (level), and neck/pelvis/nose onto a single
+  vertical body midline (straight spine, centered head, no lean). Returns null
+  when shoulders/hips aren't confidently visible. + ghostSegments(g) → the 6
+  stick-figure bones (level shoulder line, level hip line, vertical spine,
+  neck+head, two torso sides).
+- frontend/src/app/capture/capture.ts: drawSkeleton now draws the ghost UNDER the
+  detected skeleton via a new drawGhost() — dashed, translucent EMERALD (the
+  "target/ideal" color, with a soft glow) so it's clearly distinct from the solid
+  orange-joint/blue-bone detected skeleton. New ghostActive/ghostSegmentCount
+  signals drive a "Reference posture: ideal ghost overlay shown" badge +
+  data-ghost-active / data-ghost-segments hooks on the stage.
+- capture.html: reference-ghost status badge + stage data attrs.
+
+VERIFIED (browser, as a human — Playwright, real-person fake camera person.y4m):
+- / → Start scan → /scan/front; preview live; pose engine ready; 33 landmarks
+  tracked. Reference-posture badge = "ideal ghost overlay shown",
+  data-ghost-active="true", data-ghost-segments="6".
+- TWO distinct skeletons proven on the overlay bitmap: warm-orange/blue detected
+  pixels AND emerald-dominant ghost pixels both present (>0 each). The screenshot
+  shows the dashed emerald vertical spine + centered head joint + level shoulder/
+  hip lines drawn next to the detected warrior-pose skeleton. 0 console errors;
+  disclaimer visible.
+- Screenshot: logs/screens/f071-reference-ghost.png.
+- Unit test frontend/src/app/analysis/posture-metrics.spec.ts (vitest, 7/7 green
+  in the frontend container): ghost shoulders/hips are level, spine+head vertical,
+  scale/vertical span preserved, null-guards, 6 segments.
+- New smoke test smoke/tests/f071-reference-ghost.spec.ts. Full app suite GREEN
+  (13/13): cross-origin-isolation, f001, f002, f004, f005, skeleton,
+  demo-analysis-insole, f026, f034, f035, f071, f195, f196.
+
+FEATURE LIST: F071 → passes:true (10/210 passing).
+
+NEXT (HACKATHON DELIVERY track): F074 — highlight the body segments that deviate
+past threshold in a warning color (compare detected vs the ghost's ideal), then
+F073 (toggle to show/hide the ghost). Then the interactive 3D insole (F090/F091/
+F092, add three + @types/three) and STL export (F098/F099). Agent/chatbot LLM
+features remain BLOCKED until AKASHML_API_KEY is set.

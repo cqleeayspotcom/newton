@@ -127,6 +127,78 @@ export function deriveFindings(m: PostureMetrics): Finding[] {
 
 export const THRESHOLDS = TH;
 
+/**
+ * F071 — an "ideal posture" reference skeleton derived from the detected
+ * landmarks. It keeps the user's own scale and vertical position (so it lines
+ * up over their body) but corrects the posture: shoulders and hips are made
+ * LEVEL, and the spine + head are made VERTICAL through the body midline. This
+ * is what a dimmed "ghost" is drawn from, next to the real skeleton.
+ */
+export interface GhostSkeleton {
+  leftShoulder: Landmark;
+  rightShoulder: Landmark;
+  leftHip: Landmark;
+  rightHip: Landmark;
+  /** Mid-shoulder point on the vertical midline (top of the spine). */
+  neck: Landmark;
+  /** Mid-hip point on the vertical midline (base of the spine). */
+  pelvis: Landmark;
+  /** Head, centered directly above the neck (no lateral lean). */
+  nose: Landmark;
+}
+
+/**
+ * Build the ideal-posture ghost from raw landmarks. Returns null when the
+ * shoulders/hips are not confidently visible (nothing sensible to anchor to).
+ */
+export function buildReferenceGhost(
+  landmarks: Landmark[] | null,
+): GhostSkeleton | null {
+  if (!landmarks || landmarks.length < 33) return null;
+
+  const ls = landmarks[L_SHOULDER];
+  const rs = landmarks[R_SHOULDER];
+  const lh = landmarks[L_HIP];
+  const rh = landmarks[R_HIP];
+  const nose = landmarks[NOSE];
+  if (!(vis(ls) && vis(rs) && vis(lh) && vis(rh))) return null;
+
+  // Anchor to the user's own shoulder/hip midline + keep their vertical spans.
+  const msX = (ls.x + rs.x) / 2;
+  const msY = (ls.y + rs.y) / 2;
+  const mhX = (lh.x + rh.x) / 2;
+  const mhY = (lh.y + rh.y) / 2;
+  const midX = (msX + mhX) / 2; // one vertical body midline
+
+  const shoulderHalf = Math.abs(ls.x - rs.x) / 2;
+  const hipHalf = Math.abs(lh.x - rh.x) / 2;
+
+  // Keep the head's height but center it (no lean); fall back above the neck.
+  const noseY = vis(nose) ? nose.y : msY - (mhY - msY) * 0.4;
+
+  return {
+    leftShoulder: { x: midX - shoulderHalf, y: msY },
+    rightShoulder: { x: midX + shoulderHalf, y: msY },
+    leftHip: { x: midX - hipHalf, y: mhY },
+    rightHip: { x: midX + hipHalf, y: mhY },
+    neck: { x: midX, y: msY },
+    pelvis: { x: midX, y: mhY },
+    nose: { x: midX, y: noseY },
+  };
+}
+
+/** Bone segments (as point pairs) that make up the ghost stick figure. */
+export function ghostSegments(g: GhostSkeleton): [Landmark, Landmark][] {
+  return [
+    [g.leftShoulder, g.rightShoulder], // level shoulder line
+    [g.leftHip, g.rightHip], // level hip line
+    [g.neck, g.pelvis], // vertical spine
+    [g.neck, g.nose], // vertical neck + head
+    [g.leftShoulder, g.leftHip], // torso sides
+    [g.rightShoulder, g.rightHip],
+  ];
+}
+
 function round1(n: number): number {
   return Math.round(n * 10) / 10;
 }
