@@ -851,7 +851,7 @@
         "Toggle it back on and assert the ghost returns.",
         "Screenshot both states."
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "F074",

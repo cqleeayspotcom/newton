@@ -101,6 +101,21 @@
     >
       {{ ghostActive() ? 'ideal ghost overlay shown' : 'waiting for full-body view' }}
     </span>
+
+    <!-- F073 — toggle the reference ghost on/off. -->
+    <button
+      type="button"
+      class="nf-toggle"
+      role="switch"
+      [class.nf-toggle--on]="ghostEnabled()"
+      [attr.aria-checked]="ghostEnabled()"
+      [attr.data-ghost-enabled]="ghostEnabled()"
+      data-testid="ghost-toggle"
+      (click)="toggleGhost()"
+    >
+      <span class="nf-toggle__track"><span class="nf-toggle__thumb"></span></span>
+      {{ ghostEnabled() ? 'Reference on' : 'Reference off' }}
+    </button>
   </p>
 
   <p class="nf-capture__status" data-testid="deviation-highlight">
