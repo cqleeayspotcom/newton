@@ -3,9 +3,12 @@ import {
   ElementRef,
   OnDestroy,
   afterNextRender,
+  inject,
   signal,
   viewChild,
 } from '@angular/core';
+
+import { PoseEngine } from '../pose/pose-engine';
 
 /** Lifecycle of the live camera preview shown in a wizard capture step. */
 type CaptureState = 'requesting' | 'live' | 'denied' | 'error';
@@ -25,8 +28,14 @@ export class Capture implements OnDestroy {
   private readonly videoRef =
     viewChild.required<ElementRef<HTMLVideoElement>>('video');
 
+  private readonly poseEngine = inject(PoseEngine);
+
   protected readonly state = signal<CaptureState>('requesting');
   protected readonly errorMessage = signal('');
+
+  /** F034 — MediaPipe model-loading lifecycle, surfaced to the template. */
+  protected readonly poseState = this.poseEngine.state;
+  protected readonly poseError = this.poseEngine.errorMessage;
 
   private stream: MediaStream | null = null;
 
@@ -56,6 +65,11 @@ export class Capture implements OnDestroy {
       // Autoplay is set in the template; play() covers stricter policies.
       await video.play().catch(() => undefined);
       this.state.set('live');
+
+      // Once the preview is live, load the pose model (F034). Kept off the
+      // camera-start critical path; failures surface via poseState/poseError
+      // and never break the live preview.
+      void this.poseEngine.load().catch(() => undefined);
     } catch (err) {
       const name = (err as DOMException)?.name;
       if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {

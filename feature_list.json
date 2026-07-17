@@ -400,7 +400,7 @@
         "Wait until the indicator resolves and assert a 'Pose engine ready' state or the skeleton overlay becomes active.",
         "Assert no console errors related to model loading."
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "F035",

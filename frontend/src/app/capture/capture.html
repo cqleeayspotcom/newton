@@ -38,6 +38,31 @@
     </span>
   </p>
 
+  <p class="nf-capture__status" data-testid="pose-engine">
+    Pose engine:
+    <span
+      class="nf-badge"
+      [class.nf-badge--ok]="poseState() === 'ready'"
+      [attr.data-state]="poseState()"
+      data-testid="pose-engine-status"
+    >
+      @switch (poseState()) {
+        @case ('loading') {
+          Loading pose model…
+        }
+        @case ('ready') {
+          Pose engine ready
+        }
+        @case ('error') {
+          Pose engine failed to load
+        }
+        @default {
+          idle
+        }
+      }
+    </span>
+  </p>
+
   <p class="nf-capture__disclaimer" data-testid="capture-disclaimer">
     Wellness &amp; visualization POC — not medical advice. Consult a healthcare
     professional.
