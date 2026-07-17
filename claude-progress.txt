@@ -355,3 +355,61 @@ stays smooth (first of the F195-F203 daemon loops). Then F196 pipeline, F197
 One-Euro smoothing, etc. Agent/chatbot LLM features remain BLOCKED until
 AKASHML_API_KEY is set. NOTE: person.y4m is now the go-to clip for any feature
 that needs real landmark detection in-browser (e.g. F036 movement tracking).
+
+-------------------------------------------------------------------------------
+SESSION 008 — F195 (perception-daemon)  ·  2026-07-17  ·  model: claude-opus-4-8
+-------------------------------------------------------------------------------
+FEATURE: F195 — pose inference runs in a dedicated Web Worker (off the main
+thread) as the first of the F195-F203 daemon loops, so the UI + skeleton overlay
+stay smooth while the heavy MediaPipe detectForVideo call runs.
+
+WORK:
+- frontend/src/app/pose/pose.worker.ts (NEW): a dedicated Web Worker that loads
+  the MediaPipe PoseLandmarker (GPU delegate, CPU fallback) and runs
+  detectForVideo on transferred ImageBitmaps, posting {landmarks,count} back.
+- frontend/src/app/pose/pose-engine.ts: refactored from a main-thread sync
+  detect() to an async worker driver. load() spins up the worker (Angular esbuild
+  bundles it from `new Worker(new URL('./pose.worker', import.meta.url))`) and
+  resolves on the worker's 'ready' message. submitFrame(video,ts) does
+  createImageBitmap(video) on the main thread (cheap GPU copy) and TRANSFERS it to
+  the worker; results land in the landmarks/landmarkCount signals. Backpressure:
+  one frame in flight at a time (drop, don't queue). New inWorker signal is the
+  debug hook. connections stays a plain static (no WASM) for main-thread drawing.
+- frontend/src/app/capture/capture.ts: the rAF loop now submitFrame()s to the
+  worker and draws the latest worker-returned skeleton each frame — main thread
+  never blocks on inference. landmarkCount/inWorker now sourced from the engine.
+- capture.html: data-in-worker debug attr on the stage + a visible
+  "Inference: running in Web Worker (off main thread)" badge (data-testid
+  inference-worker) for the demo.
+
+KEY FIX (ADR-worthy): MediaPipe failed in the ESM worker with "ModuleFactory not
+set." Angular emits a *module* worker; MediaPipe's default non-module WASM glue
+(vision_wasm_internal.js) is dynamic-import()ed as a module and never registers
+self.ModuleFactory. Fix: FilesetResolver.forVisionTasks(wasmPath, /*useModule=*/true)
+selects the ESM glue variant (vision_wasm_module_internal.js), which loads via
+import() and registers correctly. The module wasm assets already ship in
+public/mediapipe/wasm/.
+
+VERIFIED (browser, as a human — Playwright, real-person fake camera person.y4m):
+- / -> Start scan -> /scan/front; preview live; pose engine ready; overlay draws
+  the 33-landmark skeleton over the warrior-pose subject (data-landmarks=33,
+  non-empty canvas bitmap).
+- Off-main-thread proven THREE ways: (1) app debug hook data-in-worker="true";
+  (2) Playwright page.workers() sees a live dedicated worker (.../worker-*.js);
+  (3) a main-thread rAF responsiveness probe over ~1.5s shows max frame gap
+  < 300ms while inference runs (no long-task jank). 0 console errors. Disclaimer
+  visible; cross-origin isolation intact.
+- Screenshot logs/screens/f195-pose-worker.png (skeleton + "running in Web Worker
+  (off main thread)" badge).
+- New smoke test smoke/tests/f195-pose-worker.spec.ts. Full app suite GREEN
+  (10/10): cross-origin-isolation, f001, f002, f004, f005, skeleton, f026, f034,
+  f035, f195.
+
+FEATURE LIST: F195 -> passes:true (8/210 passing).
+
+NEXT (demo-priority Phase 1): F196 — decoupled multi-rate loop pipeline
+(capture -> inference -> smoothing -> metrics -> feedback), building on the
+worker plumbing added here. Then F197 One-Euro smoothing, F198 confidence
+weighting, etc. Agent/chatbot LLM features remain BLOCKED until AKASHML_API_KEY
+is set. NOTE: person.y4m remains the go-to clip for real landmark detection; the
+pose worker is now the inference path all daemon loops build on.

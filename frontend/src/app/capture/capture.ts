@@ -41,9 +41,16 @@ export class Capture implements OnDestroy {
 
   /**
    * F035 — number of landmarks detected in the latest frame (0 when no person
-   * is in view). Surfaced as a debug hook so the overlay can be verified.
+   * is in view). Sourced from the worker via the engine so the overlay can be
+   * verified.
    */
-  protected readonly landmarkCount = signal(0);
+  protected readonly landmarkCount = this.poseEngine.landmarkCount;
+
+  /**
+   * F195 — true once inference is confirmed running off the main thread in the
+   * Web Worker. Surfaced as a debug hook (data-in-worker) for verification.
+   */
+  protected readonly inWorker = this.poseEngine.inWorker;
 
   private stream: MediaStream | null = null;
   private rafId = 0;
@@ -99,10 +106,13 @@ export class Capture implements OnDestroy {
   }
 
   /**
-   * F035 — requestAnimationFrame loop: detect the pose on each new video frame
-   * and draw a 33-landmark skeleton (bones + joints) onto the overlay canvas.
-   * The canvas mirrors the video's intrinsic resolution + cover crop so the
-   * skeleton lines up with the mirrored preview.
+   * F035 + F195 — requestAnimationFrame loop. Each frame it (a) hands the
+   * current video frame to the pose worker for OFF-main-thread inference and
+   * (b) draws the latest skeleton the worker has returned onto the overlay
+   * canvas. Because inference runs in the worker, this loop stays cheap and the
+   * main thread stays responsive even under load. The canvas mirrors the
+   * video's intrinsic resolution + cover crop so the skeleton lines up with the
+   * mirrored preview.
    */
   private startDetectLoop(): void {
     const video = this.videoRef().nativeElement;
@@ -113,27 +123,23 @@ export class Capture implements OnDestroy {
     const loop = () => {
       if (this.destroyed) return;
 
-      if (this.poseEngine.ready && video.readyState >= 2 && video.videoWidth > 0) {
+      if (video.readyState >= 2 && video.videoWidth > 0) {
         if (canvas.width !== video.videoWidth) {
           canvas.width = video.videoWidth;
           canvas.height = video.videoHeight;
         }
 
-        // detectForVideo requires a strictly increasing timestamp.
+        // Submit the frame to the worker (strictly-increasing timestamp; the
+        // engine drops frames while one is in flight). Fire-and-forget: results
+        // arrive asynchronously via the engine's landmarks signal.
         const ts = performance.now();
         if (ts > this.lastTimestamp) {
           this.lastTimestamp = ts;
-          let landmarks: { x: number; y: number; visibility?: number }[] | null =
-            null;
-          try {
-            const result = this.poseEngine.detect(video, ts);
-            landmarks = result?.landmarks?.[0] ?? null;
-          } catch {
-            landmarks = null;
-          }
-          this.drawSkeleton(ctx, canvas, landmarks);
-          this.landmarkCount.set(landmarks ? landmarks.length : 0);
+          void this.poseEngine.submitFrame(video, ts);
         }
+
+        // Draw the most recent skeleton the worker has returned.
+        this.drawSkeleton(ctx, canvas, this.poseEngine.landmarks());
       }
 
       this.rafId = requestAnimationFrame(loop);
