@@ -24,7 +24,7 @@
         "Assert the response status is 200 and the JSON body contains a status field equal to 'ok'.",
         "Assert no CORS error appears in the console."
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "F003",

@@ -106,3 +106,32 @@ NEEDED SOON: real sponsor keys in .env (AKASHML_API_KEY, ZERO_API_KEY,
 GHOST_DATABASE_URL). Without a key, implement+unit-test but leave passes:false —
 never fake a sponsor call. Loop model default is now claude-opus-4-8 (Fable 5
 credits exhausted).
+
+-------------------------------------------------------------------------------
+SESSION 002 — F002 (foundation)  ·  2026-07-17  ·  model: claude-opus-4-8
+-------------------------------------------------------------------------------
+FEATURE: F002 — backend API reachable through the frontend origin at /api, so
+the whole app works over a single (ngrok) tunnel. Phase 0 of demo-priority track.
+
+WORK:
+- No code change needed — the dev-server proxy (frontend/proxy.conf.json maps
+  /api → backend:3000) already routes same-origin /api to the NestJS backend.
+  This session is the "verify + smoke" pass demo-priority.md Phase 0 calls for.
+
+VERIFIED (browser, as a human):
+- ./init.sh → stack healthy (mysql healthy, backend {status:ok,db:ok}, frontend up).
+- Playwright MCP at http://localhost:4200/: page-context fetch('/api/health')
+  resolves to same-origin http://localhost:4200/api/health, returns HTTP 200 with
+  JSON body {status:'ok',db:'ok'}; 0 error-level console messages, no CORS error.
+  Stack-status card shows Backend API = ok, Database = ok.
+- Screenshot: logs/screens/f002-same-origin-api.png.
+- New smoke test smoke/tests/f002-backend-same-origin.spec.ts asserts same-origin
+  request URL, 200, status==='ok', no console/CORS errors. Full suite GREEN (3/3).
+
+FEATURE LIST: F002 → passes:true (2/194 passing).
+
+NEXT (demo-priority Phase 0): F004 (dockerized stack end-to-end — largely provable
+now, add screenshot+smoke), then F005 (HTTPS/secure-context via ngrok — needs the
+expose.sh tunnel up to assert window.isSecureContext). Then Phase 1 sponsors
+(F166–F168) BLOCKED until AKASHML_API_KEY / ZERO_API_KEY / GHOST_DATABASE_URL are
+in .env — implement+unit-test only, never fake to flip.
