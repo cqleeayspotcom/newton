@@ -10,11 +10,15 @@ Rules:
 - When the whole track is `passes:true`, fall back to top-to-bottom for the rest.
 
 ## ⚠️ STATUS (2026-07-17): which sponsor features are buildable
-- ✅ **Akash DEPLOY (F194)** is UNBLOCKED — `CONSOLE_API_KEY` is set and we use the
-  `console-axi` CLI/skill to deploy (see ADR-0013). Buildable any time.
-- ⛔ **AkashML (LLM), Zero.xyz, Ghost** keys are still EMPTY. While they are, **SKIP
-  ENTIRELY** (no retry, no faking): F166–F168, F169–F178, F179–F181 & F189, F190.
-  When those keys are added, delete this line and the loop resumes those phases.
+3 sponsors = **Akash + Zero + Pomerium** (ADR-0014), all buildable with NO blocking key:
+- ✅ **Akash DEPLOY (F194)** — `CONSOLE_API_KEY` set; deploy via `console-axi` (ADR-0013).
+- ✅ **Zero (F167)** — `zero` CLI set up (no key); free capabilities cost 0.
+- ✅ **Pomerium (F193, F204, F205)** — open-source proxy, no key (`docs/pomerium.md`).
+- ✅ **Agent memory (F168, F176)** — MySQL (Ghost dropped), no key.
+- ⛔ **Only `AKASHML_API_KEY` (LLM brain) is still EMPTY.** Until it's added, **SKIP
+  ENTIRELY** (no retry, no faking) the LLM-powered features: **F166**, **F169–F175 &
+  F177–F178** (agent reasoning), **F179–F181 & F189** (chatbot), **F190**. Everything
+  else — F167, F168, F176, F193/F204/F205, the posture daemon — is buildable now.
 
 ---
 
@@ -40,8 +44,9 @@ The headline analysis engine (see `docs/posture-daemon.md`). Build in this order
 
 ## Phase 2 — Sponsors / autonomous agent (Autonomy + Tool Use)
 - ✅ **F194** deploy on Akash via console-axi (runs-on-the-sponsor; buildable now)
-- ⛔ (needs keys) **F166–F168** wire AkashML + Zero + Ghost → **F169, F170, F175,
-  F171, F173, F174, F172, F176, F177, F178** Concierge agent
+- ✅ **F167** Zero CLI web tools · **F168/F176** agent memory in MySQL (buildable now)
+- ⛔ (needs `AKASHML_API_KEY`) **F166** LLM brain → **F169, F170, F175, F171, F173,
+  F174, F172, F177, F178** Concierge agent reasoning
 
 ## Phase 3 — Chatbot (needs AkashML key)
 - ⛔ F179 · F180 · F181
@@ -56,8 +61,8 @@ The headline analysis engine (see `docs/posture-daemon.md`). Build in this order
 ## Phase 6 — Progressive identity / lead capture (if time)
 - F191 email→STL/plan · F192 retrieve by link · (⛔ F190 needs chat)
 
-## Phase 7 — Optional extras
-- F193 Pomerium ingress
+## Phase 7 — Pomerium (core sponsor) + extras
+- F193 Pomerium reverse proxy · F204 access policy · F205 HTTPS + identity headers
 
 ---
 
@@ -65,5 +70,5 @@ The headline analysis engine (see `docs/posture-daemon.md`). Build in this order
 Smallest winning set: **Phase 1 posture daemon (F026,F034,F035,F195–F203 + a
 front-view finding F053/F063) + F194 (runs on Akash) + Phase 4 landing F182/F184.**
 That shows: a real-time, self-improving posture analysis (loops/daemon) running on
-Akash. Add the agent/chatbot once the AkashML/Zero/Ghost keys land — that's the
+Akash. Add the agent/chatbot once the AkashML LLM key lands — that's the
 Autonomy upside.

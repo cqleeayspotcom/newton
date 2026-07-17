@@ -1940,23 +1940,23 @@
     {
       "id": "F167",
       "category": "sponsor-zero",
-      "description": "The agent can call real-time web tools via the Zero.xyz gateway (key server-side) and receive live data.",
+      "description": "The agent calls real-time web tools via the Zero CLI (search → fetch, persisted agent session, no API key) and receives live data.",
       "steps": [
-        "Ensure ZERO_API_KEY is configured; start the stack.",
-        "Trigger an agent action that requires a live web lookup.",
-        "Assert the returned result contains fresh, real-world data (e.g. a current price or listing), not a hardcoded stub.",
+        "Ensure the Zero CLI + agent session are set up (zero init; zero auth agent register).",
+        "Trigger an agent action that requires a live web lookup via `zero search`/`zero fetch`.",
+        "Assert the returned result contains fresh real-world data (a current price/listing), not a stub.",
         "Screenshot the tool result in the UI."
       ],
       "passes": false
     },
     {
       "id": "F168",
-      "category": "sponsor-ghost",
-      "description": "Agent run state is persisted in Ghost Postgres (ephemeral per-session DB) and can be retrieved.",
+      "category": "agent-memory",
+      "description": "Agent run state (runs and plans) is persisted in the app MySQL database and can be retrieved per session.",
       "steps": [
         "Run a Concierge agent flow to completion.",
         "Reload the page for the same session id.",
-        "Assert the prior agent run/plan is retrieved and shown (state persisted in Ghost).",
+        "Assert the prior agent run/plan is retrieved and shown (state persisted in MySQL).",
         "Screenshot the restored run."
       ],
       "passes": false
@@ -1964,7 +1964,7 @@
     {
       "id": "F169",
       "category": "agent-concierge",
-      "description": "The backend agent orchestrator runs a bounded plan/tool-call/observe loop using the AkashML brain, Zero tools, and Ghost memory.",
+      "description": "The backend agent orchestrator runs a bounded plan/tool-call/observe loop using the AkashML brain, Zero tools, and MySQL memory.",
       "steps": [
         "Trigger the Concierge agent from an analysis result.",
         "Assert the activity feed shows multiple sequential autonomous steps (plan then tool calls then result).",
@@ -2047,7 +2047,7 @@
     {
       "id": "F176",
       "category": "agent-concierge",
-      "description": "Agent memory/state is persisted to Ghost so a run is reviewable and resumable per session.",
+      "description": "Agent memory/state is persisted to MySQL so a run is reviewable/resumable per session.",
       "steps": [
         "Complete an agent run, then revisit the run from the session history.",
         "Assert the full step history and plan are shown from persisted state.",
@@ -2245,11 +2245,11 @@
     {
       "id": "F193",
       "category": "sponsor-pomerium",
-      "description": "Optional 4th sponsor: a zero-trust HTTPS ingress (Pomerium) sits in front of the app with an access policy.",
+      "description": "Pomerium (open-source, identity-aware reverse proxy) runs as a docker-compose service in front of the app; all traffic routes through it.",
       "steps": [
-        "Deploy the app behind Pomerium with a policy configured.",
-        "Access the public HTTPS URL and assert the app loads over TLS through Pomerium.",
-        "Assert requests outside the policy are blocked.",
+        "Start the stack with the Pomerium service enabled.",
+        "Open the app through the Pomerium route.",
+        "Assert the app loads via Pomerium (proxied) and health passes through it.",
         "Screenshot the served app."
       ],
       "passes": false
@@ -2367,6 +2367,30 @@
         "Run a live session and assert a derived-metrics record is produced (angles/stats only, no image data).",
         "Assert no frame/image bytes are present in the logged payload or any network request.",
         "Screenshot the metrics record."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F204",
+      "category": "sponsor-pomerium",
+      "description": "A Pomerium access policy protects a restricted route (e.g. a clinician/admin view): allowed identities pass; others get a friendly access-denied page.",
+      "steps": [
+        "Configure a Pomerium policy allowing a specific identity to a protected route.",
+        "Access the protected route as an allowed identity and assert it loads.",
+        "Access it as a disallowed/anonymous identity and assert a clear access-denied response.",
+        "Screenshot both outcomes."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F205",
+      "category": "sponsor-pomerium",
+      "description": "Pomerium terminates HTTPS and passes identity headers to the backend, acting as the secure front door (satisfying the camera secure-context).",
+      "steps": [
+        "Open the app through Pomerium over HTTPS.",
+        "Assert the connection is secure (TLS) and the camera secure-context is satisfied.",
+        "Assert the backend receives Pomerium identity headers on a protected call.",
+        "Screenshot the secure app + a header readout."
       ],
       "passes": false
     }

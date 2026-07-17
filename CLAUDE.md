@@ -6,11 +6,11 @@ plus an autonomous **Concierge agent** that acts on the web with real-time data
 device**. A disclaimer ("Not medical advice — consult a healthcare professional")
 must be visible on analysis and recommendation screens.
 
-**Hackathon framing (see docs/decisions.md ADR-0008):** judged on Autonomy, Idea,
-Technical Implementation, Tool Use (**≥3 sponsor tools**), and Demo. The 3 sponsor
-tools each do real work: **Akash/AkashML** = LLM brain (agent + chatbot),
-**Zero.xyz** = the agent's real-time web tools, **Ghost** = agent memory (Postgres
-for AI agents). Optional 4th: Pomerium (secure ingress) or Akash Network hosting.
+**Hackathon framing (see docs/decisions.md ADR-0008/0014):** judged on Autonomy,
+Idea, Technical Implementation, Tool Use (**≥3 sponsor tools**), and Demo. The 3
+sponsor tools (all usable with NO blocking key): **Akash** = deploy via console-axi
+(+ optional AkashML LLM brain), **Zero** = the agent's real-time web tools (`zero`
+CLI), **Pomerium** = identity-aware secure front door. Agent memory lives in MySQL.
 
 **New session? Read `prompts/coding_agent.md` and follow its startup routine.**
 This file is high-signal context only — it points to where things live.
@@ -87,10 +87,15 @@ This file is high-signal context only — it points to where things live.
   only, never in the browser**; the NestJS backend proxies it. PAID (trial credits)
   → enforce rate limits + `max_completion_tokens`. Do not confuse with the free
   `chat.akash.network` app (no API) or renting raw Akash Network compute (F194).
-- **Zero.xyz**: the agent's real-time web tools/APIs. Key in `ZERO_API_KEY`
-  (server-side). This is what makes the agent "act on the web with real-time data."
-- **Ghost** (Postgres for AI agents, MCP): agent memory/state, ephemeral per-session
-  DB. Uses `pg` (config via `GHOST_DATABASE_URL`); core app tables stay MySQL for now.
+- **Zero** (NO key): the agent's real-time web tools via the `zero` CLI (installed
+  globally by `zero init`; `zero auth agent register` for an anonymous session).
+  Loop: `zero search → get → fetch → review`. Free capabilities cost 0; paid ones
+  need `zero wallet fund`. This is what makes the agent "act on the web in real time."
+- **Pomerium** (NO key, open-source): identity-aware reverse proxy / secure front
+  door + access policy (F193, F204, F205); config via `pomerium/config.yaml`
+  (`autocert` or hosted authenticate). See `docs/pomerium.md`.
+- **Agent memory** lives in the app **MySQL** DB (a migration adds agent_runs/plans);
+  Ghost is dropped (ADR-0014).
 - **Akash deploy** via **console-axi** (`CONSOLE_API_KEY`, an Akash *Console* key —
   NOT AkashML): deploy the stack to Akash Network with no private keys (ADR-0013,
   F194). `console-axi login --with-key $CONSOLE_API_KEY`; `sdl init` → `deploy`.
@@ -100,7 +105,7 @@ This file is high-signal context only — it points to where things live.
   gate triggers only at high intent (after ~3 free chatbot/agent messages, or to
   receive the STL/plan). No passwords/accounts.
 - The autonomous **Concierge agent** (F166–F178) is the headline: one click after
-  analysis → agent plans (AkashML) → calls web tools (Zero) → persists state (Ghost)
+  analysis → agent plans (AkashML) → calls web tools (Zero) → persists state (MySQL)
   → streams a visible activity feed. Keep it genuinely autonomous (no manual steps
   mid-run) and bounded (step cap, cost cap).
 
