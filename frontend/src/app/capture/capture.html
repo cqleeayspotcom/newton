@@ -9,6 +9,8 @@
     [attr.data-state]="state()"
     [attr.data-landmarks]="landmarkCount()"
     [attr.data-in-worker]="inWorker()"
+    [attr.data-ghost-active]="ghostActive()"
+    [attr.data-ghost-segments]="ghostSegmentCount()"
   >
     <video
       #video
@@ -84,6 +86,18 @@
       data-testid="landmark-count"
     >
       {{ landmarkCount() > 0 ? landmarkCount() + ' landmarks tracked' : 'no person detected' }}
+    </span>
+  </p>
+
+  <p class="nf-capture__status" data-testid="reference-ghost">
+    Reference posture:
+    <span
+      class="nf-badge"
+      [class.nf-badge--ok]="ghostActive()"
+      [attr.data-ghost-active]="ghostActive()"
+      data-testid="reference-ghost-status"
+    >
+      {{ ghostActive() ? 'ideal ghost overlay shown' : 'waiting for full-body view' }}
     </span>
   </p>
 

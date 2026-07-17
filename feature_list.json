@@ -828,7 +828,7 @@
         "Assert two skeletons render on the still: the user's skeleton and a visually distinct ghost (dashed or translucent) representing ideal posture.",
         "Screenshot the overlay."
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "F072",
