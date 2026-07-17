@@ -243,3 +243,29 @@ offline, and is deterministic across the demo machine and headless smoke runs. C
 ~20 MB of binary assets in git (acceptable for a POC; revisit with Git LFS / a service
 worker cache if it grows). Future fresh image builds get the npm package via
 `package.json`; the assets ship as static files independent of `node_modules`.
+
+## ADR-0017 — Pose inference runs in an ESM Web Worker (`useModule: true`)
+**Date:** 2026-07-17 · **Status:** accepted
+**Context:** F195 (first of the F195–F203 posture-daemon loops) requires pose
+inference to run off the main thread so the UI + skeleton overlay stay smooth.
+Angular's esbuild builder bundles `new Worker(new URL('./pose.worker', import.meta.url))`
+as an **ES module** worker. MediaPipe's `FilesetResolver.forVisionTasks(path)`
+defaults to the *non-module* WASM glue (`vision_wasm_internal.js`), which a module
+worker loads via `import()` — it never registers `self.ModuleFactory`, so init
+dies with **"ModuleFactory not set."** (A classic worker isn't an option: esbuild
+emits module workers and `importScripts` is unavailable in them.)
+**Decision:** The worker calls `FilesetResolver.forVisionTasks(wasmPath, /*useModule=*/true)`
+to select the **ESM glue variant** (`vision_wasm_module_internal.js`, already
+shipped in `public/mediapipe/wasm/` per ADR-0016), which loads via `import()` and
+registers correctly. Frames cross the boundary as **transferred `ImageBitmap`s**
+(`createImageBitmap(video)` on the main thread — a cheap GPU copy — then a
+zero-copy transfer); the worker runs `detectForVideo` and posts landmarks back
+into signals. Backpressure = one frame in flight (drop, don't queue). `PoseEngine`
+became an async worker driver (`load()` + `submitFrame()` + `landmarks`/`inWorker`
+signals) instead of the old synchronous `detect()`.
+**Consequences:** Heavy inference never blocks the main thread (verified: max rAF
+gap < 300 ms while running). The `useModule: true` flag is load-bearing — a future
+bump of `@mediapipe/tasks-vision` must keep shipping the `*_module_internal`
+assets. The rest of the daemon (F196 pipeline, F197 smoothing, …) builds on this
+worker path. `connections` (POSE_CONNECTIONS) stays a plain static constant so the
+main thread can still draw bones without touching WASM.

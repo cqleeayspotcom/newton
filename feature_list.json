@@ -2276,7 +2276,7 @@
         "Assert (via a debug readout) that inference executes in a worker, not the main thread.",
         "Screenshot the live overlay."
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "F196",

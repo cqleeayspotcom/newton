@@ -8,6 +8,7 @@
     class="nf-capture__stage"
     [attr.data-state]="state()"
     [attr.data-landmarks]="landmarkCount()"
+    [attr.data-in-worker]="inWorker()"
   >
     <video
       #video
@@ -83,6 +84,18 @@
       data-testid="landmark-count"
     >
       {{ landmarkCount() > 0 ? landmarkCount() + ' landmarks tracked' : 'no person detected' }}
+    </span>
+  </p>
+
+  <p class="nf-capture__status" data-testid="inference-thread">
+    Inference:
+    <span
+      class="nf-badge"
+      [class.nf-badge--ok]="inWorker()"
+      [attr.data-in-worker]="inWorker()"
+      data-testid="inference-worker"
+    >
+      {{ inWorker() ? 'running in Web Worker (off main thread)' : 'main thread' }}
     </span>
   </p>
 
