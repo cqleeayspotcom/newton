@@ -69,6 +69,14 @@ export class Capture implements OnDestroy {
   protected readonly ghostActive = signal(false);
   protected readonly ghostSegmentCount = signal(0);
 
+  /**
+   * F074 — the metric keys whose skeleton segment is currently drawn in the
+   * warning colour because the metric deviates past threshold (e.g.
+   * `shoulder_tilt`). Exposed as a debug/verification hook so the highlighted
+   * deviation on the detected skeleton can be asserted.
+   */
+  protected readonly deviatedSegments = signal<string[]>([]);
+
   /** F034 — MediaPipe model-loading lifecycle, surfaced to the template. */
   protected readonly poseState = this.poseEngine.state;
   protected readonly poseError = this.poseEngine.errorMessage;
@@ -258,6 +266,7 @@ export class Capture implements OnDestroy {
     if (!landmarks || landmarks.length === 0) {
       this.ghostActive.set(false);
       this.ghostSegmentCount.set(0);
+      this.deviatedSegments.set([]);
       return;
     }
 
@@ -265,19 +274,39 @@ export class Capture implements OnDestroy {
     // the real (solid) skeleton reads on top of it.
     this.drawGhost(ctx, canvas, buildReferenceGhost(landmarks));
 
+    // F074 — which body segments deviate past threshold, from the SAME
+    // landmarks we are about to draw (so the highlight matches the skeleton).
+    const deviated = new Set(
+      deriveFindings(computeMetrics(landmarks)).map((f) => f.key),
+    );
+    this.deviatedSegments.set([...deviated]);
+
     const px = (n: number, size: number) => n * size;
 
-    // Bones first, then joints on top.
-    ctx.lineWidth = Math.max(2, canvas.width / 200);
-    ctx.strokeStyle = '#38bdf8';
+    // Bones first, then joints on top. Deviating segments are drawn in the
+    // warning colour (thicker + a glow) so the difference from the ideal ghost
+    // is obvious; segments within tolerance stay the neutral blue.
+    const baseWidth = Math.max(2, canvas.width / 200);
     for (const { start, end } of this.poseEngine.connections) {
       const a = landmarks[start];
       const b = landmarks[end];
       if (!a || !b) continue;
+      const warn = isDeviatedConnection(start, end, deviated);
+      ctx.save();
+      if (warn) {
+        ctx.strokeStyle = DEVIATION_COLOR;
+        ctx.lineWidth = baseWidth * 1.8;
+        ctx.shadowColor = DEVIATION_COLOR;
+        ctx.shadowBlur = Math.max(4, canvas.width / 90);
+      } else {
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = baseWidth;
+      }
       ctx.beginPath();
       ctx.moveTo(px(a.x, canvas.width), px(a.y, canvas.height));
       ctx.lineTo(px(b.x, canvas.width), px(b.y, canvas.height));
       ctx.stroke();
+      ctx.restore();
     }
 
     const r = Math.max(3, canvas.width / 120);
@@ -364,6 +393,39 @@ export class Capture implements OnDestroy {
     this.stream?.getTracks().forEach((track) => track.stop());
     this.stream = null;
   }
+}
+
+/**
+ * F074 — warning colour for a skeleton segment whose posture metric deviates
+ * past threshold. A bright red that reads over the video and is clearly
+ * distinct from the neutral blue bones, orange joints, and emerald ghost.
+ */
+const DEVIATION_COLOR = '#ff3b30';
+
+// BlazePose landmark indices for the bones each front-view metric measures.
+const L_SHOULDER = 11;
+const R_SHOULDER = 12;
+const L_HIP = 23;
+const R_HIP = 24;
+/** Head/face landmarks (nose, eyes, ears, mouth) — indices 0–10. */
+const HEAD_MAX = 10;
+
+/**
+ * F074 — true when the bone `start`→`end` is the segment that visualises a
+ * deviated metric: the shoulder line for a shoulder tilt, the hip line for a
+ * pelvic tilt, and the head/face bones for a head lateral lean.
+ */
+function isDeviatedConnection(
+  start: number,
+  end: number,
+  deviated: Set<string>,
+): boolean {
+  const isPair = (a: number, b: number) =>
+    (start === a && end === b) || (start === b && end === a);
+  if (deviated.has('shoulder_tilt') && isPair(L_SHOULDER, R_SHOULDER)) return true;
+  if (deviated.has('pelvic_tilt') && isPair(L_HIP, R_HIP)) return true;
+  if (deviated.has('head_lean') && start <= HEAD_MAX && end <= HEAD_MAX) return true;
+  return false;
 }
 
 /** L4 metrics loop target period (~10Hz). */

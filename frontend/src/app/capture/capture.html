@@ -11,6 +11,8 @@
     [attr.data-in-worker]="inWorker()"
     [attr.data-ghost-active]="ghostActive()"
     [attr.data-ghost-segments]="ghostSegmentCount()"
+    [attr.data-deviated-segments]="deviatedSegments().join(',')"
+    [attr.data-deviated-count]="deviatedSegments().length"
   >
     <video
       #video
@@ -98,6 +100,22 @@
       data-testid="reference-ghost-status"
     >
       {{ ghostActive() ? 'ideal ghost overlay shown' : 'waiting for full-body view' }}
+    </span>
+  </p>
+
+  <p class="nf-capture__status" data-testid="deviation-highlight">
+    Deviations:
+    <span
+      class="nf-badge"
+      [class.nf-badge--warn]="deviatedSegments().length > 0"
+      [attr.data-deviated-count]="deviatedSegments().length"
+      data-testid="deviation-highlight-status"
+    >
+      {{
+        deviatedSegments().length > 0
+          ? deviatedSegments().length + ' segment(s) highlighted on your skeleton'
+          : 'no segments past threshold'
+      }}
     </span>
   </p>
 

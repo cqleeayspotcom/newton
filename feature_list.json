@@ -862,7 +862,7 @@
         "Assert the corresponding skeleton segment (e.g. shoulder line) is rendered in the warning color while normal segments stay neutral.",
         "Screenshot the highlighted deviation."
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "F075",
