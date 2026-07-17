@@ -38,10 +38,12 @@ Read this prompt, then follow the startup routine exactly.
      slice: sponsors → minimal scan → the autonomous Concierge agent → chatbot →
      landing. Only when that whole track is passing do you fall back to top-to-bottom.
    - Respect logical dependencies (don't build the 3D viewer before the insole engine).
-   - Sponsor features (F166–F168) and the agent need real keys in `.env`
-     (`AKASHML_API_KEY`, `ZERO_API_KEY`, `GHOST_DATABASE_URL`). If a key is missing,
-     implement + unit-test the integration but leave the feature `passes:false` —
-     **never fake a sponsor call to flip it.** Pick the next buildable feature instead.
+   - Sponsor/agent features need real keys in `.env` (`AKASHML_API_KEY`,
+     `ZERO_API_KEY`, `GHOST_DATABASE_URL`). **If the relevant key is empty, SKIP that
+     feature entirely this session** — do not spend the session writing unverifiable
+     sponsor code, do not retry it — and pick the next *buildable* feature in the track.
+     Never fake a sponsor call to flip `passes`. See the SKIP list in
+     `docs/demo-priority.md` (updated when keys are added).
 
 ## Implementing the feature
 - **Branch first — never commit to `main`.** Once you've selected your one feature,

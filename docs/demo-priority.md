@@ -13,11 +13,18 @@ Rules:
   here — that's fine; build the minimum needed, keep it in the track's spirit.
 - When this whole track is `passes:true`, fall back to top-to-bottom for the rest.
 
-## ⚠️ Sponsor keys gate Phase 1 + the agent
-F166/F167/F168 and the Concierge agent need real keys in `.env`:
-`AKASHML_API_KEY` (Akash), `ZERO_API_KEY` (Zero.xyz), `GHOST_DATABASE_URL` (Ghost).
-If a key is missing, implement + unit-test the integration but **leave the feature
-`passes:false`** (never fake a sponsor call to flip it). Get the keys early.
+## ⚠️ STATUS (2026-07-17): sponsor keys NOT set → SKIP these until keys exist
+F166/F167/F168 + the agent + the chatbot need keys in `.env` (`AKASHML_API_KEY`,
+`ZERO_API_KEY`, `GHOST_DATABASE_URL`). **While those are empty, SKIP ENTIRELY**
+(do not spend a session on them, do not retry, do not fake a sponsor call):
+- **F166–F168** (Phase 1 sponsors), **F169–F178** (Phase 3 agent),
+  **F179–F181 & F189** (Phase 4 chatbot), **F190** (email gate after chat).
+
+Build the buildable phases instead: Phase 0 remainder → **Phase 2** →
+**Phase 5 (minus F189)** → **Phase 6** → **F191–F192**. That is ~150 features of
+real progress with no keys. **When the keys are added, delete this banner** and the
+loop resumes the skipped phases automatically. Get the keys early — they unblock the
+headline (Autonomy).
 
 ---
 
