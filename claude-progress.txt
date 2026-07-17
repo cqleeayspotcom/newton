@@ -304,3 +304,54 @@ NOTE: the fake y4m clips have no human, so F035 must expose a debug/landmark-cou
 hook and be verified with a clip that yields detections (or assert the overlay
 plumbing + a landmark-count hook). Agent/chatbot LLM features remain BLOCKED
 until AKASHML_API_KEY is set.
+
+-------------------------------------------------------------------------------
+SESSION 007 — F035 (pose-engine)  ·  2026-07-17  ·  model: claude-opus-4-8
+-------------------------------------------------------------------------------
+FEATURE: F035 — a real-time 33-landmark skeleton overlay (joints + connecting
+bones) is drawn over the live camera preview. Phase 1 (posture daemon) pose base;
+this rendering pipeline (detect -> landmarks -> canvas) is what the F195-F203
+daemon loops build on.
+
+WORK:
+- Real-person fake-camera clip (the blocker): the synthetic front/side/back y4m
+  patterns contain NO human, so MediaPipe yields 0 landmarks on them. Added
+  tools/test_media/gen_person_y4m.mjs — decodes a royalty-free full-body photo
+  (MediaPipe's own pose.jpg sample) via Playwright's bundled Chromium canvas
+  (local ffmpeg is arch-broken: libfribidi x86_64/arm64 mismatch), converts RGBA
+  -> planar I420 (BT.601), and emits tools/test_media/person.y4m (480x320, looped
+  frames). Chrome's fake camera now streams a detectable human. Existing synthetic
+  clips are LEFT UNTOUCHED (F026/F034 depend on them).
+- frontend/src/app/pose/pose-engine.ts: expose `connections` (BlazePose 33-pt
+  topology = PoseLandmarker.POSE_CONNECTIONS) for bone drawing.
+- frontend/src/app/capture/capture.ts: added an rAF detect loop — each new video
+  frame calls poseEngine.detect(video, performance.now()) (strictly-increasing
+  timestamp guard), draws bones then joints onto an overlay <canvas>, and updates
+  a landmarkCount signal. Loop self-guards on engine-ready + decoded frame, and
+  is cancelled in ngOnDestroy (no leaked rAF).
+- capture.html/.scss: overlay <canvas data-testid="skeleton-overlay"> absolutely
+  positioned over the video, matching its cover-crop + scaleX(-1) mirror so the
+  skeleton lines up with the mirrored preview; a "Skeleton: N landmarks tracked"
+  badge (data-testid=landmark-count, data-landmarks) + data-landmarks on the stage
+  as the debug hook.
+
+VERIFIED (browser, as a human — Playwright, real-person fake camera person.y4m):
+- / -> Start scan -> /scan/front; preview live; pose engine ready; the overlay
+  canvas reported data-landmarks="33" and the badge read "33 landmarks tracked".
+  Read back the canvas bitmap: >0 non-transparent pixels drawn. 0 error-level
+  console messages. Disclaimer + secure context intact.
+- Screenshot logs/screens/f035-skeleton-overlay.png shows the orange joints + blue
+  bones tracking the subject's actual warrior-pose limbs over the live preview.
+- New smoke test smoke/tests/f035-skeleton-overlay.spec.ts asserts the overlay,
+  data-landmarks=33, badge text, non-empty canvas bitmap, disclaimer, zero console
+  errors. Full app suite GREEN (7/7): f001,f002,f004,skeleton,f026,f034,f035.
+  f005 NOT re-run — it needs a live ngrok tunnel (external infra); no code here
+  touched it, so it is not a regression from this session.
+
+FEATURE LIST: F035 -> passes:true (7/210 passing).
+
+NEXT (demo-priority Phase 1): F195 — run pose inference in a Web Worker so the UI
+stays smooth (first of the F195-F203 daemon loops). Then F196 pipeline, F197
+One-Euro smoothing, etc. Agent/chatbot LLM features remain BLOCKED until
+AKASHML_API_KEY is set. NOTE: person.y4m is now the go-to clip for any feature
+that needs real landmark detection in-browser (e.g. F036 movement tracking).
