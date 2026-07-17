@@ -7,7 +7,8 @@
   <section class="nf-hero">
     <h1>Newfoot</h1>
     <p class="nf-lede">
-      Camera-based posture analysis &amp; corrective insole recommendation.
+      See your posture, fix your stance. A phone camera analyzes your whole body
+      and designs a corrective 3D-printed insole — on-device and private.
     </p>
 
     <div class="nf-status" data-testid="stack-status">
@@ -39,14 +40,18 @@
 
     <p class="nf-cta-row">
       <a class="nf-cta" routerLink="/scan/front" data-testid="start-scan">
-        Start front-view scan
+        Analyze my posture →
       </a>
     </p>
 
-    <p class="nf-skeleton-note">
-      Skeleton ready — product features are built one per session (see
-      <code>feature_list.json</code>).
+    <p class="nf-privacy" data-testid="privacy">
+      🔒 Your video never leaves your device — only posture angles are computed.
     </p>
+    <div class="nf-how" data-testid="how-it-works">
+      <span><b>1.</b> Scan</span>
+      <span><b>2.</b> See</span>
+      <span><b>3.</b> Solve</span>
+    </div>
   </section>
 
   <router-outlet />

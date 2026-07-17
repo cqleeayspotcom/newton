@@ -129,6 +129,39 @@
     </div>
   </div>
 
+  <!-- Live posture findings + call to action. -->
+  <div class="nf-findings" data-testid="findings">
+    <h3 class="nf-findings__title">Live posture analysis</h3>
+    @if (!hasPerson()) {
+      <p class="nf-findings__empty">Step into frame — waiting for a full-body view…</p>
+    } @else if (liveFindings().length === 0) {
+      <p class="nf-findings__ok" data-testid="findings-none">
+        ✓ No significant deviations detected in this view.
+      </p>
+    } @else {
+      <ul class="nf-findings__list">
+        @for (f of liveFindings(); track f.key) {
+          <li class="nf-finding" [attr.data-severity]="f.severity" data-testid="finding">
+            <div class="nf-finding__head">
+              <span class="nf-finding__label">{{ f.label }}</span>
+              <span class="nf-finding__value">{{ f.valueDeg }}° · {{ f.severity }}</span>
+            </div>
+            <p class="nf-finding__explain">{{ f.explanation }}</p>
+          </li>
+        }
+      </ul>
+    }
+
+    <button
+      type="button"
+      class="nf-cta nf-findings__cta"
+      data-testid="get-insole"
+      (click)="analyze()"
+    >
+      Get my corrective insole →
+    </button>
+  </div>
+
   <p class="nf-capture__disclaimer" data-testid="capture-disclaimer">
     Wellness &amp; visualization POC — not medical advice. Consult a healthcare
     professional.
