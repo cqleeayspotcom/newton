@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 
 import { AnalysisStore } from '../analysis/analysis-store';
 import { recommendInsole } from './insole-rules';
+import { InsoleViewer } from './insole-viewer';
 
 /**
  * Insole recommendation screen (POC demo slice). Reads the posture findings from
@@ -12,7 +13,7 @@ import { recommendInsole } from './insole-rules';
 @Component({
   selector: 'nf-insole',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, InsoleViewer],
   templateUrl: './insole.html',
   styleUrl: './insole.scss',
 })
