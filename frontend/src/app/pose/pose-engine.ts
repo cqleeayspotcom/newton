@@ -1,6 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { PoseLandmarker } from '@mediapipe/tasks-vision';
 
+import { RateMeter } from './rate-meter';
 import type { WorkerLandmark } from './pose.worker';
 
 /** Lifecycle of the client-side MediaPipe pose model. */
@@ -41,6 +42,14 @@ export class PoseEngine {
   readonly landmarks = signal<WorkerLandmark[] | null>(null);
   /** Landmark count of the latest frame (0 when no person is in view). */
   readonly landmarkCount = signal(0);
+
+  /**
+   * F196 — measures the inference loop's throughput. Ticked every time the
+   * worker posts a detection result back, so the perf panel can show the real
+   * (lower) inference rate versus the fast render rate — proving the loops are
+   * decoupled and slow inference never throttles rendering.
+   */
+  private readonly inferenceMeter = new RateMeter();
 
   private worker: Worker | null = null;
   private loadPromise: Promise<void> | null = null;
@@ -118,6 +127,7 @@ export class PoseEngine {
         this.readyReject?.(new Error(msg.message));
         break;
       case 'result':
+        this.inferenceMeter.tick(performance.now());
         this.landmarks.set(msg.landmarks);
         this.landmarkCount.set(msg.landmarkCount);
         this.busy = false;
@@ -151,6 +161,15 @@ export class PoseEngine {
 
   get ready(): boolean {
     return this.worker !== null && this.state() === 'ready';
+  }
+
+  /**
+   * F196 — the inference loop's current throughput (Hz) as of `now`. Reads the
+   * sliding-window meter that is ticked on each worker result, so it decays to 0
+   * when detection stalls. The metrics loop samples this for the perf panel.
+   */
+  inferenceRate(now: number): number {
+    return this.inferenceMeter.hzAt(now);
   }
 
   /**

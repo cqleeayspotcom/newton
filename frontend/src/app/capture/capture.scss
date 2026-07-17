@@ -67,3 +67,58 @@
   font-size: 0.8rem;
   color: var(--nf-fg-muted);
 }
+
+/* F196 — live multi-rate pipeline perf panel. */
+.nf-perf {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border: 1px solid var(--nf-border);
+  border-radius: 10px;
+  background: var(--nf-bg-elev, rgba(56, 189, 248, 0.06));
+}
+
+.nf-perf__title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--nf-fg-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.nf-perf__loops {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+}
+
+.nf-perf__loop {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.5rem;
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.06);
+  text-align: center;
+}
+
+.nf-perf__label {
+  font-size: 0.7rem;
+  color: var(--nf-fg-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.nf-perf__hz {
+  font-size: 1.05rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--nf-accent, #38bdf8);
+}
+
+@media (max-width: 420px) {
+  .nf-perf__loops {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
