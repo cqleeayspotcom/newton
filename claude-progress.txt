@@ -85,3 +85,24 @@ FEATURE LIST: F001 → passes:true (1/165 passing).
 NEXT: F002 (backend reachable via /api same-origin) is nearly proven by the
 status card — verify + smoke-test it. Then F003 (deep-link refresh) which may
 need dev-server history fallback checks, F004, F006+ design system.
+
+-------------------------------------------------------------------------------
+DIRECTION UPDATE — HACKATHON PIVOT  ·  2026-07-17  ·  (planning, not a feature)
+-------------------------------------------------------------------------------
+Judged on Autonomy / Idea / Technical Impl / Tool Use (>=3 sponsors) / Demo.
+Pivot: added an autonomous CONCIERGE AGENT (acts on the web with real-time data)
++ 3 sponsor tools — Akash/AkashML (LLM brain), Zero.xyz (web tools), Ghost
+(Postgres agent memory). Features appended F166-F194 (existing 165 untouched).
+See docs/decisions.md ADR-0008/0009/0010 and docs/market-landing.md.
+
+*** BUILD ORDER OVERRIDE ***
+NEXT and all subsequent selection: follow **docs/demo-priority.md** (demo-first
+track), NOT ascending ID. Order: Phase 0 foundation (F002,F004,F005) -> Phase 1
+sponsors (F166,F167,F168) -> Phase 2 minimal scan (F026,F034,F035,F041,F042,F044,
+F046,F048,F053,F056,F063,F065,F110,F117,F126) -> Phase 3 Concierge agent
+(F169,F170,F175,F171,F173,F174,...) -> Phase 4 chatbot -> Phase 5 landing.
+
+NEEDED SOON: real sponsor keys in .env (AKASHML_API_KEY, ZERO_API_KEY,
+GHOST_DATABASE_URL). Without a key, implement+unit-test but leave passes:false —
+never fake a sponsor call. Loop model default is now claude-opus-4-8 (Fable 5
+credits exhausted).

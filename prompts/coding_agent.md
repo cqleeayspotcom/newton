@@ -31,10 +31,16 @@ Read this prompt, then follow the startup routine exactly.
    - If any smoke test is **red**: the corresponding feature has regressed. Flip
      that feature back to `"passes": false` in `feature_list.json`, and fixing it
      is your task this session. Stop the selection process here.
-6. If smoke is green, open `feature_list.json` and pick **exactly one** feature
-   with `"passes": false`, highest priority first (roughly top-to-bottom order;
-   respect logical dependencies — don't build the 3D viewer before the insole
-   engine exists).
+6. If smoke is green, pick **exactly one** feature with `"passes": false`:
+   - **Hackathon: follow `docs/demo-priority.md`.** Build the earliest not-yet-passing
+     feature in that ordered track (NOT ascending ID). It sequences the demo-winning
+     slice: sponsors → minimal scan → the autonomous Concierge agent → chatbot →
+     landing. Only when that whole track is passing do you fall back to top-to-bottom.
+   - Respect logical dependencies (don't build the 3D viewer before the insole engine).
+   - Sponsor features (F166–F168) and the agent need real keys in `.env`
+     (`AKASHML_API_KEY`, `ZERO_API_KEY`, `GHOST_DATABASE_URL`). If a key is missing,
+     implement + unit-test the integration but leave the feature `passes:false` —
+     **never fake a sponsor call to flip it.** Pick the next buildable feature instead.
 
 ## Implementing the feature
 - Use **just-in-time context**: don't preload the codebase. Navigate with
