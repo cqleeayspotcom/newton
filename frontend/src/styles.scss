@@ -1,101 +1,164 @@
-/* Newfoot base tokens. The full design system is built as a feature
-   (see feature_list.json / design-system); this is a neutral, dark-mode-aware
-   baseline so the skeleton renders cleanly on phone and desktop. */
+/* Newfoot design system — professional, light/dark, self-hosted system fonts
+   (no external fonts: COEP require-corp blocks cross-origin resources). */
 
 :root {
   color-scheme: light dark;
 
-  --nf-bg: #f7f8fa;
+  --nf-bg: #f5f6f9;
+  --nf-bg-grad: radial-gradient(1200px 600px at 50% -10%, #eaeeff 0%, transparent 60%);
   --nf-surface: #ffffff;
-  --nf-fg: #14161a;
-  --nf-fg-muted: #5b6470;
-  --nf-border: #e3e6eb;
+  --nf-surface-2: #fbfbfe;
+  --nf-fg: #0f1729;
+  --nf-fg-muted: #5a6576;
+  --nf-border: #e6e8ef;
 
-  --nf-accent: #2f6bff;
-  --nf-accent-soft: #e7efff;
-  --nf-ok: #1f8a5b;
-  --nf-ok-soft: #e2f5ec;
-  --nf-danger: #c23b3b;
-  --nf-danger-soft: #fbe6e6;
+  --nf-accent: #3b5bfd;
+  --nf-accent-2: #22d3ee;
+  --nf-accent-soft: #ecefff;
+  --nf-ok: #16875a;
+  --nf-ok-soft: #e4f5ec;
+  --nf-warn: #b7791f;
+  --nf-danger: #c2412f;
+  --nf-danger-soft: #fbe8e5;
+
+  --nf-shadow-sm: 0 1px 2px rgba(15, 23, 41, 0.05);
+  --nf-shadow: 0 1px 2px rgba(15, 23, 41, 0.05), 0 12px 30px -14px rgba(15, 23, 41, 0.18);
+  --nf-radius: 14px;
+  --nf-radius-lg: 20px;
+
+  --nf-font: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial,
+    sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --nf-bg: #0e1013;
-    --nf-surface: #1a1d22;
-    --nf-fg: #f2f4f7;
-    --nf-fg-muted: #9aa4b2;
-    --nf-border: #2a2f37;
+    --nf-bg: #0a0d13;
+    --nf-bg-grad: radial-gradient(1200px 600px at 50% -10%, #16203f 0%, transparent 60%);
+    --nf-surface: #141a24;
+    --nf-surface-2: #10151d;
+    --nf-fg: #eef2f8;
+    --nf-fg-muted: #93a0b4;
+    --nf-border: #232b39;
 
-    --nf-accent: #6f9bff;
-    --nf-accent-soft: #1c2740;
+    --nf-accent: #6f8dff;
+    --nf-accent-soft: #1a2440;
     --nf-ok: #4cc38a;
-    --nf-ok-soft: #133025;
-    --nf-danger: #f16a6a;
-    --nf-danger-soft: #3a1c1c;
+    --nf-ok-soft: #12281f;
+    --nf-warn: #e0b25a;
+    --nf-danger: #f1746a;
+    --nf-danger-soft: #351a18;
+
+    --nf-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 16px 40px -18px rgba(0, 0, 0, 0.7);
   }
 }
 
 * {
   box-sizing: border-box;
 }
-
 html,
 body {
   margin: 0;
   padding: 0;
 }
-
 body {
   min-height: 100dvh;
   background: var(--nf-bg);
+  background-image: var(--nf-bg-grad);
+  background-attachment: fixed;
   color: var(--nf-fg);
-  font-family:
-    system-ui,
-    -apple-system,
-    'Segoe UI',
-    Roboto,
-    Helvetica,
-    Arial,
-    sans-serif;
+  font-family: var(--nf-font);
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3 {
+  letter-spacing: -0.025em;
+  line-height: 1.1;
 }
 
 code {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   background: var(--nf-accent-soft);
   color: var(--nf-accent);
-  padding: 0.05rem 0.3rem;
-  border-radius: 5px;
+  padding: 0.05rem 0.35rem;
+  border-radius: 6px;
+  font-size: 0.85em;
 }
 
-/* Shared primary button (global so scoped components pick it up). */
+/* --- Buttons --- */
 .nf-cta {
-  display: inline-block;
-  padding: 0.7rem 1.25rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.7rem 1.2rem;
   border: none;
-  border-radius: 10px;
-  background: var(--nf-accent);
+  border-radius: 12px;
+  background: linear-gradient(180deg, var(--nf-accent), color-mix(in srgb, var(--nf-accent) 88%, #000));
   color: #fff;
-  font-weight: 600;
-  font-size: 1rem;
+  font-weight: 650;
+  font-size: 0.95rem;
   text-decoration: none;
   cursor: pointer;
+  box-shadow: var(--nf-shadow-sm), 0 8px 20px -10px color-mix(in srgb, var(--nf-accent) 70%, transparent);
+  transition: transform 0.12s ease, filter 0.12s ease;
 
   &:hover {
-    filter: brightness(1.06);
+    filter: brightness(1.05);
+    transform: translateY(-1px);
+  }
+  &:active {
+    transform: translateY(0);
+  }
+}
+.nf-cta--lg {
+  padding: 0.9rem 1.6rem;
+  font-size: 1.05rem;
+  border-radius: 14px;
+}
+
+/* --- Badges / status --- */
+.nf-badge {
+  font-size: 0.72rem;
+  font-weight: 650;
+  padding: 0.18rem 0.55rem;
+  border-radius: 999px;
+  background: var(--nf-border);
+  color: var(--nf-fg-muted);
+  text-transform: lowercase;
+  letter-spacing: 0.02em;
+
+  &--ok {
+    background: var(--nf-ok-soft);
+    color: var(--nf-ok);
+  }
+  &--down {
+    background: var(--nf-danger-soft);
+    color: var(--nf-danger);
   }
 }
 
-/* Live posture findings (used in the capture screen). */
+/* --- Cards --- */
+.nf-card {
+  border: 1px solid var(--nf-border);
+  border-radius: var(--nf-radius);
+  background: var(--nf-surface);
+  box-shadow: var(--nf-shadow);
+}
+
+/* --- Live posture findings (capture screen) --- */
 .nf-findings {
-  max-width: 520px;
-  margin: 1.5rem auto 0;
+  max-width: 560px;
+  margin: 1.75rem auto 0;
   text-align: left;
 }
 .nf-findings__title {
-  font-size: 1rem;
-  margin: 0 0 0.6rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--nf-fg-muted);
+  margin: 0 0 0.75rem;
 }
 .nf-findings__empty,
 .nf-findings__ok {
@@ -104,24 +167,26 @@ code {
 }
 .nf-findings__ok {
   color: var(--nf-ok);
+  font-weight: 600;
 }
 .nf-findings__list {
   list-style: none;
-  margin: 0 0 1rem;
+  margin: 0 0 1.1rem;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.6rem;
 }
 .nf-finding {
   border: 1px solid var(--nf-border);
   border-left: 3px solid var(--nf-fg-muted);
-  border-radius: 10px;
+  border-radius: 12px;
   background: var(--nf-surface);
-  padding: 0.6rem 0.8rem;
+  box-shadow: var(--nf-shadow-sm);
+  padding: 0.7rem 0.9rem;
 
   &[data-severity='mild'] {
-    border-left-color: #d9a441;
+    border-left-color: var(--nf-warn);
   }
   &[data-severity='moderate'] {
     border-left-color: #e07a3e;
@@ -134,38 +199,21 @@ code {
   display: flex;
   justify-content: space-between;
   gap: 0.75rem;
-  font-weight: 600;
-  font-size: 0.92rem;
+  font-weight: 650;
+  font-size: 0.94rem;
 }
 .nf-finding__value {
   color: var(--nf-fg-muted);
-  font-weight: 500;
+  font-weight: 600;
   text-transform: capitalize;
+  font-variant-numeric: tabular-nums;
 }
 .nf-finding__explain {
-  margin: 0.3rem 0 0;
-  font-size: 0.83rem;
+  margin: 0.35rem 0 0;
+  font-size: 0.84rem;
   color: var(--nf-fg-muted);
+  line-height: 1.5;
 }
 .nf-findings__cta {
   margin-top: 0.5rem;
-}
-
-/* Home hero extras */
-.nf-privacy {
-  margin: 1rem 0 0;
-  font-size: 0.82rem;
-  color: var(--nf-fg-muted);
-}
-.nf-how {
-  display: flex;
-  gap: 1.25rem;
-  justify-content: center;
-  margin-top: 0.75rem;
-  font-size: 0.85rem;
-  color: var(--nf-fg-muted);
-
-  b {
-    color: var(--nf-accent);
-  }
 }

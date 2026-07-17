@@ -1,0 +1,56 @@
+<section class="nf-landing" data-testid="app-home">
+  <div class="nf-hero">
+    <span class="nf-eyebrow">Posture analysis · corrective insoles</span>
+    <h1>Newfoot</h1>
+    <p class="nf-lede">
+      See your posture, fix your stance. A phone camera analyzes your whole body
+      <strong>on-device</strong> and designs a corrective 3D-printed insole — private
+      by design.
+    </p>
+    <a class="nf-cta nf-cta--lg" routerLink="/scan/front" data-testid="start-scan">
+      Analyze my posture →
+    </a>
+    <p class="nf-privacy" data-testid="privacy">
+      🔒 Your video never leaves your device — only posture angles are computed.
+    </p>
+  </div>
+
+  <div class="nf-steps" data-testid="how-it-works">
+    <article class="nf-step">
+      <span class="nf-step__n">1</span>
+      <h3>Scan</h3>
+      <p>Front camera + an on-device pose model draw a real-time 33-point skeleton.</p>
+    </article>
+    <article class="nf-step">
+      <span class="nf-step__n">2</span>
+      <h3>See</h3>
+      <p>Live posture findings — shoulder, pelvic, head — in plain language.</p>
+    </article>
+    <article class="nf-step">
+      <span class="nf-step__n">3</span>
+      <h3>Solve</h3>
+      <p>A corrective insole spec, an interactive 3D model, and a printable STL.</p>
+    </article>
+  </div>
+
+  <p class="nf-syschip" aria-label="system status">
+    <span class="nf-dot" [class.nf-dot--down]="backend() === 'down' || db() === 'down'"></span>
+    <span class="nf-sysok" data-testid="status-frontend">ready</span> frontend
+    <span class="nf-sep">·</span>
+    <span
+      data-testid="status-backend"
+      [class.nf-sysok]="backend() === 'ok'"
+      [class.nf-sysdown]="backend() === 'down'"
+      >{{ backend() }}</span
+    >
+    api
+    <span class="nf-sep">·</span>
+    <span
+      data-testid="status-db"
+      [class.nf-sysok]="db() === 'ok'"
+      [class.nf-sysdown]="db() === 'down'"
+      >{{ db() }}</span
+    >
+    db
+  </p>
+</section>
