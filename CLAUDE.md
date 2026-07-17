@@ -33,8 +33,10 @@ This file is high-signal context only — it points to where things live.
 - `docs/` — `research.md` (pose SOTA + metric thresholds), `insole-rules.md` (rule
   table posture+size → insole params), `decisions.md` (ADRs — read before changing
   architecture).
-- `feature_list.json` — the roadmap (194 features; F001–F165 core app, F166–F194
-  agent + 3 sponsors + landing page). Source of truth for what to build.
+- `feature_list.json` — the roadmap (203 features; F001–F165 core app, F166–F194
+  agent + sponsors + landing, F195–F203 posture perception daemon). Build order is
+  `docs/demo-priority.md` (posture daemon is the TOP priority).
+- `docs/posture-daemon.md` — the real-time posture analysis loop/daemon architecture.
 - `docs/market-landing.md` — market analysis behind the landing-page features.
 - `tools/` — `db.sh`, `stl_check.js`, `expose.sh`, `pose_fixtures/`, `test_media/`.
 - `smoke/` — Playwright regression suite (one test per passing feature).
@@ -89,6 +91,10 @@ This file is high-signal context only — it points to where things live.
   (server-side). This is what makes the agent "act on the web with real-time data."
 - **Ghost** (Postgres for AI agents, MCP): agent memory/state, ephemeral per-session
   DB. Uses `pg` (config via `GHOST_DATABASE_URL`); core app tables stay MySQL for now.
+- **Akash deploy** via **console-axi** (`CONSOLE_API_KEY`, an Akash *Console* key —
+  NOT AkashML): deploy the stack to Akash Network with no private keys (ADR-0013,
+  F194). `console-axi login --with-key $CONSOLE_API_KEY`; `sdl init` → `deploy`.
+  Distinct from AkashML (LLM) which needs its own `AKASHML_API_KEY`.
 - **Identity = progressive (ADR-0009, supersedes the old "no login" rule):** landing
   page + camera analysis stay anonymous (session id); a lightweight email/lead-capture
   gate triggers only at high intent (after ~3 free chatbot/agent messages, or to

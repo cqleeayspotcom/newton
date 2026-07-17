@@ -2265,6 +2265,110 @@
         "Screenshot the live deployed app."
       ],
       "passes": false
+    },
+    {
+      "id": "F195",
+      "category": "perception-daemon",
+      "description": "Pose inference runs in a Web Worker (off the main thread) as a background daemon so the UI and skeleton overlay stay smooth while inference runs.",
+      "steps": [
+        "Launch Chromium with the fake camera; open the live analysis screen.",
+        "Assert the skeleton overlay renders and the main thread stays responsive (no long-task jank while inference runs).",
+        "Assert (via a debug readout) that inference executes in a worker, not the main thread.",
+        "Screenshot the live overlay."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F196",
+      "category": "perception-daemon",
+      "description": "The perception pipeline runs as decoupled multi-rate loops (capture → inference → smoothing → metrics → feedback) so slow inference never blocks rendering.",
+      "steps": [
+        "Open the live analysis screen with the fake camera.",
+        "Assert a debug/perf panel shows separate rates for capture (~30Hz), inference, and metrics loops.",
+        "Assert the overlay render rate stays high even when the inference rate is lower.",
+        "Screenshot the perf panel."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F197",
+      "category": "pose-smoothing",
+      "description": "A One-Euro temporal filter smooths each landmark so the skeleton overlay is visibly stable (jitter removed) compared with raw detections.",
+      "steps": [
+        "Unit-test the One-Euro filter on a noisy landmark fixture and assert output variance drops without added lag beyond tolerance.",
+        "Open the live screen and toggle raw vs smoothed; assert the smoothed skeleton is visibly steadier.",
+        "Screenshot both states."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F198",
+      "category": "pose-smoothing",
+      "description": "Low-visibility landmarks are confidence-weighted (attenuated or interpolated) so occluded joints do not produce aberrant angles.",
+      "steps": [
+        "Unit-test that landmarks below a visibility threshold are down-weighted/interpolated in the smoothing stage.",
+        "Open the live screen; assert low-confidence joints render de-emphasized (per F038) and their metrics are marked low-confidence rather than wrong.",
+        "Screenshot the de-emphasized state."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F199",
+      "category": "posture-metrics",
+      "description": "Deficiencies are persistence-gated: a metric must stay past its threshold for a sustained window (with hysteresis) before being flagged, so transient movement does not trigger false findings.",
+      "steps": [
+        "Unit-test the persistence/hysteresis gate: a brief threshold breach does NOT flag; a sustained one does.",
+        "On the live screen, move briefly out of alignment and assert no finding is raised.",
+        "Hold a deviation past the window and assert the finding then appears.",
+        "Screenshot the flagged state."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F200",
+      "category": "pose-engine",
+      "description": "A temporal sequence model over a rolling window classifies posture stability/state (the article's LSTM approach; baseline = rolling stats, upgrade = TF.js LSTM), improving robustness over single-frame detection.",
+      "steps": [
+        "Unit-test the temporal classifier on a sequence fixture (stable vs unstable) and assert correct labels.",
+        "On the live screen, assert a posture-state indicator reflects sustained state, not per-frame flicker.",
+        "Screenshot the indicator."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F201",
+      "category": "feedback-loop",
+      "description": "Closed-loop live coaching guides the user (\"step back\", \"hold still\", \"aligned\") with a real-time posture-quality/confidence meter driven by the daemon.",
+      "steps": [
+        "Open the live analysis screen with the fake camera.",
+        "Assert contextual coaching messages appear and update as the daemon state changes.",
+        "Assert a live quality/confidence meter is visible and moves with detection quality.",
+        "Screenshot the coaching + meter."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F202",
+      "category": "calibration-daemon",
+      "description": "Adaptive calibration estimates camera tilt, scale (inter-shoulder distance) and the user's neutral baseline so thresholds normalize per setup.",
+      "steps": [
+        "Unit-test the calibration math (tilt from a vertical reference; scale from inter-shoulder pixels).",
+        "On the live screen, assert a calibration status shows once a stable baseline is captured.",
+        "Assert metrics use the calibrated scale (a debug readout shows normalized values).",
+        "Screenshot the calibrated state."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F203",
+      "category": "observability",
+      "description": "The daemon logs only derived metrics (never video) for offline threshold/filter tuning via the run_loop self-improvement hook — privacy-preserving.",
+      "steps": [
+        "Run a live session and assert a derived-metrics record is produced (angles/stats only, no image data).",
+        "Assert no frame/image bytes are present in the logged payload or any network request.",
+        "Screenshot the metrics record."
+      ],
+      "passes": false
     }
   ]
 }
