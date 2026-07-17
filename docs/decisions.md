@@ -226,3 +226,20 @@ Safety rails: parameter clamps, a kill-switch, and the fixtures floor.
 be broken by a tuning change; no human labels or approvals are needed. Distinct from
 `run_loop.sh` (which autonomously improves *code*): L7 improves the *model/params* at
 runtime. Derived metrics only — video never leaves the device.
+
+## ADR-0016 — Self-host the MediaPipe pose assets (WASM + `.task` model)
+**Date:** 2026-07-17 · **Status:** accepted
+**Context:** F034 loads the MediaPipe Pose Landmarker (`@mediapipe/tasks-vision`
+0.10.35) client-side. `FilesetResolver`/`PoseLandmarker` can pull the WASM runtime
+and the BlazePose GHUM `.task` model from a CDN (jsDelivr / Google storage), but a
+demo-venue network is unreliable and CDN reliance leaks the visit + breaks offline.
+**Decision:** **Self-host** the vision WASM bundle and the **full** model under
+`frontend/public/mediapipe/` (`/mediapipe/wasm`, `/mediapipe/models/pose_landmarker_full.task`),
+committed to the repo. The `PoseEngine` service loads from our own origin, tries the
+**GPU (WebGL) delegate** and **falls back to CPU** when no usable WebGL2 context
+exists (headless CI, weak GPUs). Model choice = **full** (≈6–9 MB) per docs/research.md §1.2.
+**Consequences:** The pose engine loads with no third-party network dependency, works
+offline, and is deterministic across the demo machine and headless smoke runs. Cost:
+~20 MB of binary assets in git (acceptable for a POC; revisit with Git LFS / a service
+worker cache if it grows). Future fresh image builds get the npm package via
+`package.json`; the assets ship as static files independent of `node_modules`.

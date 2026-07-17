@@ -255,3 +255,52 @@ NEXT (demo-priority Phase 1): F034 — MediaPipe Pose Landmarker loads in the
 capture step ("Loading pose model…" → "Pose engine ready"), then F035 (33-landmark
 skeleton overlay canvas). Agent/chatbot LLM features remain BLOCKED until
 AKASHML_API_KEY is set.
+
+-------------------------------------------------------------------------------
+SESSION 006 — F034 (pose-engine)  ·  2026-07-17  ·  model: claude-opus-4-8
+-------------------------------------------------------------------------------
+FEATURE: F034 — the MediaPipe Pose Landmarker loads client-side with a visible
+model-loading state ("Loading pose model…" → "Pose engine ready") before
+detection starts. Phase 1 (posture daemon) pose base; unblocks F035 skeleton
+overlay + the F195–F203 daemon loops.
+
+WORK:
+- Added dependency @mediapipe/tasks-vision@0.10.35 (frontend/package.json).
+- SELF-HOSTED assets (ADR-0016): copied the vision WASM runtime to
+  frontend/public/mediapipe/wasm/ and downloaded the BlazePose GHUM *full* model
+  to frontend/public/mediapipe/models/pose_landmarker_full.task — loads from our
+  own origin (no CDN, works offline, deterministic in headless CI).
+- New injectable frontend/src/app/pose/pose-engine.ts (PoseEngine): idempotent
+  load() → FilesetResolver.forVisionTasks('/mediapipe/wasm') +
+  PoseLandmarker.createFromOptions({modelAssetPath, runningMode:'VIDEO',
+  numPoses:1}); tries GPU (WebGL) delegate, falls back to CPU when no WebGL2
+  context (headless/weak GPU). Exposes state signal idle|loading|ready|error +
+  a detect() hook for F035. state()==='ready' when the landmarker is built.
+- Wired into Capture: once the preview goes live it kicks off poseEngine.load()
+  (off the camera critical path; failures surface via poseState, never break the
+  preview). Template shows a "Pose engine" badge: Loading pose model… → Pose
+  engine ready (data-testid=pose-engine-status, data-state).
+- Installed the npm package into the running frontend container's node_modules
+  volume so ng serve resolves the import; package.json change future-proofs fresh
+  image builds.
+
+VERIFIED (browser, as a human — Playwright MCP, fake FRONT camera):
+- / → Start scan → /scan/front; preview went live; the pose badge resolved to
+  "Pose engine ready", data-state="ready", GPU delegate loaded (WASM from
+  /mediapipe/wasm/vision_wasm_internal.js). 0 error-level console messages (the
+  only warning is a benign MediaPipe "OpenGL error checking is disabled" GL info
+  line). Disclaimer + secure context confirmed.
+- Screenshot: logs/screens/f034-pose-engine-ready.png (live preview + "Pose
+  engine: Pose engine ready" + disclaimer).
+- New smoke test smoke/tests/f034-pose-model-loads.spec.ts asserts the
+  loading→ready lifecycle, data-state=ready, disclaimer, zero console errors.
+  Full suite GREEN (7/7): f001,f002,f004,f005,skeleton,f026,f034.
+
+FEATURE LIST: F034 → passes:true (6/210 passing).
+
+NEXT (demo-priority Phase 1): F035 — real-time 33-landmark skeleton overlay
+canvas drawn over the live preview (uses PoseEngine.detect() in a rAF loop).
+NOTE: the fake y4m clips have no human, so F035 must expose a debug/landmark-count
+hook and be verified with a clip that yields detections (or assert the overlay
+plumbing + a landmark-count hook). Agent/chatbot LLM features remain BLOCKED
+until AKASHML_API_KEY is set.
