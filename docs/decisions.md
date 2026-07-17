@@ -129,3 +129,23 @@ OPTIONAL. Default demo path remains `tools/expose.sh` (ngrok HTTPS). If time all
 deploy to Akash for a persistent public URL and an extra "runs on the sponsor" point.
 **Consequences:** No hard dependency on Akash hosting for the demo; camera secure-
 context still satisfied by ngrok.
+
+## ADR-0011 — Branch per session + PR auto-merge (no direct commits to main)
+**Date:** 2026-07-17 · **Status:** accepted · **Supersedes** the initial "commit to main each session"
+**Context:** Committing straight to `main` every session is messy and gives no
+review/CI gate. It's a POC, so we want a lightweight CI/CD-style flow, not manual PRs.
+**Decision:** Sessions never touch `main` directly. Each session: branches
+`feat/Fxxx-<slug>` off an up-to-date main → commits the whole feature (code +
+`passes:true` flip + smoke test + progress entry) in one commit → runs
+`tools/land.sh`, which pushes, opens a PR (`gh pr create --fill`), and squash
+auto-merges (`gh pr merge --squash`), deletes the branch, and returns to a clean
+main. `run_loop.sh` starts each session on a fresh main and treats "not on main /
+dirty tree afterwards" as a contract violation.
+**Merge mode:** `LAND_MERGE_MODE=admin` (default) merges immediately via admin
+bypass — fine for a POC with no required checks. Switch to `LAND_MERGE_MODE=auto`
+once a CI gate (GitHub Actions or **Buildkite**, a sponsor) runs the smoke suite on
+the PR, so merges wait for green. `tools/land.sh` also has a no-remote fallback
+(local `--no-ff` merge) for portability.
+**Consequences:** Requires `gh` authenticated + an `origin` remote (present here:
+github.com/cqleeayspotcom/newton, admin). Clean per-feature squash history on main;
+each feature is one revert-able PR.

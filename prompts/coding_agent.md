@@ -7,8 +7,9 @@ Read this prompt, then follow the startup routine exactly.
 ## Golden rules (non-negotiable)
 1. **One feature per session.** Pick exactly one failing feature, finish it, verify
    it, commit, stop. Never start a second.
-2. **Leave the repo mergeable.** No half-finished work. If you can't finish, revert
-   your changes rather than leaving a mess (`git checkout .` / `git clean -fd`).
+2. **Branch per session; never commit to `main`.** Work on a `feat/Fxxx-<slug>`
+   branch and land it via `tools/land.sh` (PR → squash auto-merge). No half-finished
+   work — if you can't finish, delete the branch so `main` stays clean and mergeable.
 3. **`feature_list.json` is sacred.** Never remove, rewrite, or weaken a feature.
    Only flip `passes` from `false` to `true`, and only after real end-to-end
    verification. You MAY append new features discovered along the way.
@@ -43,6 +44,10 @@ Read this prompt, then follow the startup routine exactly.
      **never fake a sponsor call to flip it.** Pick the next buildable feature instead.
 
 ## Implementing the feature
+- **Branch first — never commit to `main`.** Once you've selected your one feature,
+  branch off an up-to-date main:
+  `git checkout main && git pull --ff-only && git checkout -b feat/<Fxxx>-<short-slug>`
+  (e.g. `feat/F166-akashml-client`). All your work happens on this branch.
 - Use **just-in-time context**: don't preload the codebase. Navigate with
   Glob/Grep and targeted reads. `CLAUDE.md` points to where things live.
 - Keep the backend rule engine and STL generator **minimal and dependency-light**
@@ -68,12 +73,20 @@ Read this prompt, then follow the startup routine exactly.
    sure the whole smoke suite is green.
 6. Only now set `"passes": true` for that feature in `feature_list.json`.
 
-## Finish the session
-1. `git add -A && git commit -m "<Fxxx>: <what shipped> — verified via <how>"`.
-2. Append a progress entry to `claude-progress.txt`: feature id worked on, how it
-   was verified, screenshots produced, smoke-suite status, and cost/turns.
-3. If you made a non-trivial architecture choice, add an ADR to `docs/decisions.md`.
-4. Ensure `git status` is clean. Stop.
+## Finish the session (branch → PR → auto-merge)
+1. Commit everything on your feature branch in ONE commit — code, the
+   `feature_list.json` `passes:true` flip, the new smoke test, the progress entry,
+   and any ADR: `git add -A && git commit -m "<Fxxx>: <what shipped> — verified via <how>"`.
+2. Append the progress entry to `claude-progress.txt` BEFORE that commit (so it
+   lands with the feature): feature id, how verified, screenshots, smoke status, cost.
+3. If you made a non-trivial architecture choice, add an ADR to `docs/decisions.md`
+   (also before the commit).
+4. **Land it:** `bash tools/land.sh` — pushes the branch, opens a PR, squash
+   auto-merges into main, deletes the branch, and returns you to a clean `main`.
+5. Verify you end **on `main`** with `git status` clean. Stop.
+
+Never commit or push to `main` directly. If you can't finish, delete the branch
+(`git checkout main && git branch -D <branch>`) so main stays clean.
 
 ## Tools you have
 - `./init.sh`, `tools/db.sh [migrate|status|reset|seed]`, `tools/expose.sh`

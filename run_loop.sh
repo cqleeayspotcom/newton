@@ -34,12 +34,16 @@ next_num() {
   printf '%03d' "$n"
 }
 
-BOOTSTRAP='Read prompts/coding_agent.md and CLAUDE.md in full, then complete EXACTLY ONE failing feature from feature_list.json following the startup routine. Run ./init.sh, run the smoke suite, pick one passes:false feature, implement it, verify it end-to-end through the browser (screenshot to logs/screens/), add a smoke test, flip passes:true only after real verification, commit with a descriptive message, and append an entry to claude-progress.txt. Leave the repo clean.'
+BOOTSTRAP='Read prompts/coding_agent.md and CLAUDE.md in full, then complete EXACTLY ONE failing feature following the startup routine. Run ./init.sh, run the smoke suite, and pick the next passes:false feature from docs/demo-priority.md (demo-first order, NOT ascending id). Create a feat/<Fxxx>-<slug> branch off main (never commit to main). Implement it, verify end-to-end through the browser (screenshot to logs/screens/), add a smoke test, flip passes:true only after real verification, append an entry to claude-progress.txt, commit on the branch, then run tools/land.sh to open a PR and squash auto-merge into main. End on a clean main.'
 
 for ((s=1; s<=SESSIONS; s++)); do
   NN="$(next_num)"
   LOG="logs/session-${NN}.jsonl"
   SUMMARY="logs/session-${NN}.json"
+
+  # Start each session from a clean, up-to-date main (work happens on a branch).
+  git checkout main --quiet 2>/dev/null || true
+  git pull --ff-only origin main --quiet 2>/dev/null || true
 
   before="$(count_passing)"
   echo "==================================================================="
@@ -75,7 +79,13 @@ for ((s=1; s<=SESSIONS; s++)); do
   after="$(count_passing)"
   echo "▸ Session ${NN} done | passing ${before} -> ${after} | exit ${code}"
 
-  # Contract: repo must be clean after every session.
+  # Contract: session must land its branch and return to a clean main.
+  CUR_BRANCH="$(git branch --show-current)"
+  if [ "$CUR_BRANCH" != "main" ]; then
+    echo "✗ CONTRACT VIOLATION: session left branch '${CUR_BRANCH}' checked out (expected main)." >&2
+    echo "  Did tools/land.sh run? Stopping loop." >&2
+    exit 2
+  fi
   if [ -n "$(git status --porcelain)" ]; then
     echo "✗ CONTRACT VIOLATION: repo is dirty after session ${NN}." >&2
     git status --short >&2
