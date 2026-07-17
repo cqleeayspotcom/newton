@@ -172,3 +172,46 @@ tools/expose.sh tunnel live to assert window.isSecureContext===true and
 navigator.mediaDevices.getUserMedia over https. Then Phase 1 sponsors (F166-F168)
 remain BLOCKED until AKASHML_API_KEY / ZERO_API_KEY / GHOST_DATABASE_URL are set
 in .env (currently blank) — implement+unit-test only, never fake to flip.
+
+-------------------------------------------------------------------------------
+SESSION 004 — F005 (foundation)  ·  2026-07-17  ·  model: claude-opus-4-8
+-------------------------------------------------------------------------------
+FEATURE: F005 — the app is served over HTTPS through the ngrok tunnel and reports
+a secure context, so the camera APIs (getUserMedia) are available. Phase 0 of the
+demo-priority track; unblocks the camera/pose features (F026/F034/F035) that need
+a real HTTPS origin on a phone.
+
+WORK:
+- No product code change — the stack already serves the app and `ngrok http 4200
+  --host-header=rewrite` (tools/expose.sh) exposes it over HTTPS. This session is
+  the real end-to-end proof + a repeatable smoke test that drives the actual public
+  HTTPS origin (not localhost).
+- New helper smoke/helpers/ngrok.ts: spawns (or reuses) an ngrok tunnel, reads the
+  public https URL from ngrok's local API (127.0.0.1:4040/api/tunnels), returns a
+  stop() for teardown. Reuses an existing tunnel to respect the free-tier 1-session
+  limit.
+- New smoke test smoke/tests/f005-https-secure-context.spec.ts: navigates a real
+  browser to the live https ngrok URL with the `ngrok-skip-browser-warning` header
+  (bypasses the free-tier interstitial so the real app loads), then asserts
+  page.url() is https://, window.isSecureContext===true, typeof
+  navigator.mediaDevices.getUserMedia==='function', location.protocol==='https:',
+  and app-root is visible.
+
+VERIFIED (browser, as a human):
+- ngrok tunnel came up (https://<random>.ngrok-free.dev); the smoke test drove a
+  real Chromium against that public HTTPS origin (NOT localhost) and all four F005
+  step-assertions passed.
+- Screenshot logs/screens/f005-https-secure-context.png shows the real Newfoot app
+  (hero + status card + "not medical advice" disclaimer footer) rendered over the
+  https ngrok origin — confirming the interstitial was bypassed and the app itself
+  is on a secure context.
+- Full smoke suite GREEN (5/5): f001, f002, f004, f005, skeleton.
+
+FEATURE LIST: F005 → passes:true (4/210 passing).
+
+NEXT (demo-priority Phase 1 — REAL-TIME POSTURE DAEMON): F026 (wizard FRONT
+capture step requests camera + shows live preview). Buildable now: localhost is a
+secure context, and the fake-camera Chromium flags (fakeCameraArgs('front')) feed
+a synthetic clip so the <video> preview can be verified headlessly. Then F034
+(MediaPipe loads) · F035 (skeleton overlay) · the F195–F203 daemon loops. Agent/
+chatbot LLM features remain BLOCKED until AKASHML_API_KEY is set.

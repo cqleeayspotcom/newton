@@ -60,7 +60,7 @@
         "Evaluate 'typeof navigator.mediaDevices?.getUserMedia' and assert it is 'function'.",
         "Assert the browser address bar context is https (page URL starts with https://)."
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "F006",
