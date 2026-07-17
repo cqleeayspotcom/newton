@@ -10,8 +10,7 @@
 # Usage:
 #   ./run_loop.sh [num_sessions]        # default 1
 # Env:
-#   NEWFOOT_MODEL   model id (default claude-fable-5; override e.g. claude-opus-4-8
-#                   for harder features)
+#   NEWFOOT_MODEL   model id (default claude-opus-4-8; override e.g. claude-sonnet-5)
 #   MAX_TURNS       per-session turn cap (default 200)
 set -uo pipefail
 
@@ -20,7 +19,7 @@ cd "$ROOT"
 
 SESSIONS="${1:-1}"
 MAX_TURNS="${MAX_TURNS:-200}"
-MODEL="${NEWFOOT_MODEL:-claude-fable-5}"
+MODEL="${NEWFOOT_MODEL:-claude-opus-4-8}"
 
 command -v claude >/dev/null 2>&1 || { echo "error: claude CLI not found." >&2; exit 1; }
 mkdir -p logs

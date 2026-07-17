@@ -74,13 +74,15 @@ verify camera UI but NOT landmark detection — the fixtures cover metric math.
 **Consequences:** Pose-dependent in-browser features may need a real royalty-free
 human clip dropped into `tools/test_media/` to exercise the full pipeline.
 
-## ADR-0007 — Loop model defaults to Fable 5, overridable
-**Date:** 2026-07-17 · **Status:** accepted
-**Context:** Operator preference to prioritize the Fable 5 model where suitable.
-**Decision:** `run_loop.sh` defaults `NEWFOOT_MODEL=claude-fable-5`, overridable
-per run (e.g. `NEWFOOT_MODEL=claude-opus-4-8 ./run_loop.sh` for harder features).
-**Consequences:** Sessions run on Fable 5 unless overridden; escalate the model
-for features that need more capability.
+## ADR-0007 — Loop model default (now claude-opus-4-8)
+**Date:** 2026-07-17 · **Status:** amended
+**Context:** Initially defaulted to Fable 5 per operator preference. Fable 5 usage
+credits were exhausted mid-build (subagents failed with "Usage credits are
+required for this model"), and the operator switched back to Opus.
+**Decision:** `run_loop.sh` defaults `NEWFOOT_MODEL=claude-opus-4-8`, overridable
+per run (e.g. `NEWFOOT_MODEL=claude-sonnet-5 ./run_loop.sh`).
+**Consequences:** Sessions run on Opus 4.8 unless overridden. Re-enable Fable 5
+only after credits are topped up.
 
 ## ADR-0008 — Autonomous "Concierge" agent + 3-sponsor stack (hackathon pivot)
 **Date:** 2026-07-17 · **Status:** accepted
