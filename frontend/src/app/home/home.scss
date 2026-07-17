@@ -1,0 +1,124 @@
+.nf-landing {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 3.5rem 1.25rem 4rem;
+  text-align: center;
+}
+
+.nf-hero {
+  max-width: 620px;
+  margin: 0 auto;
+}
+
+.nf-eyebrow {
+  display: inline-block;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--nf-fg-muted);
+  margin-bottom: 1rem;
+}
+
+.nf-hero h1 {
+  margin: 0 0 0.6rem;
+  font-size: clamp(3rem, 11vw, 5rem);
+  font-weight: 800;
+}
+
+.nf-lede {
+  margin: 0 auto 1.8rem;
+  max-width: 46ch;
+  color: var(--nf-fg-muted);
+  font-size: clamp(1.05rem, 2.6vw, 1.25rem);
+  line-height: 1.6;
+
+  strong {
+    color: var(--nf-fg);
+    font-weight: 650;
+  }
+}
+
+.nf-privacy {
+  margin: 1.1rem 0 0;
+  font-size: 0.82rem;
+  color: var(--nf-fg-muted);
+}
+
+.nf-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin: 3rem auto 0;
+  text-align: left;
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.nf-step {
+  border: 1px solid var(--nf-border);
+  border-radius: var(--nf-radius);
+  background: var(--nf-surface);
+  box-shadow: var(--nf-shadow);
+  padding: 1.25rem 1.25rem 1.4rem;
+
+  h3 {
+    margin: 0.6rem 0 0.35rem;
+    font-size: 1.05rem;
+  }
+  p {
+    margin: 0;
+    color: var(--nf-fg-muted);
+    font-size: 0.9rem;
+    line-height: 1.55;
+  }
+}
+
+.nf-step__n {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  font-weight: 750;
+  font-size: 0.95rem;
+  color: var(--nf-accent);
+  background: var(--nf-accent-soft);
+}
+
+.nf-syschip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 3rem auto 0;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--nf-border);
+  border-radius: 999px;
+  background: var(--nf-surface);
+  font-size: 0.76rem;
+  color: var(--nf-fg-muted);
+}
+.nf-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--nf-ok);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--nf-ok) 70%, transparent);
+  &--down {
+    background: var(--nf-danger);
+    box-shadow: none;
+  }
+}
+.nf-sysok {
+  color: var(--nf-ok);
+  font-weight: 650;
+}
+.nf-sysdown {
+  color: var(--nf-danger);
+  font-weight: 650;
+}
+.nf-sep {
+  opacity: 0.5;
+}

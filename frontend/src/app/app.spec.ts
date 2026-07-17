@@ -1,35 +1,24 @@
 import { TestBed } from '@angular/core/testing';
-import { provideHttpClient } from '@angular/common/http';
-import {
-  provideHttpClientTesting,
-  HttpTestingController,
-} from '@angular/common/http/testing';
+import { provideRouter } from '@angular/router';
 import { App } from './app';
 
 describe('App', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [App],
-      providers: [provideHttpClient(), provideHttpClientTesting()],
+      providers: [provideRouter([])],
     }).compileComponents();
   });
 
-  it('should create the app', () => {
+  it('creates the app shell', () => {
     const fixture = TestBed.createComponent(App);
-    const app = fixture.componentInstance;
-    expect(app).toBeTruthy();
-    // Flush the health request the component fires on init.
-    const httpMock = TestBed.inject(HttpTestingController);
-    httpMock.expectOne('/api/health').flush({ status: 'ok', db: 'ok' });
-    httpMock.verify();
+    expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it('should render the Newfoot title', async () => {
+  it('renders the brand wordmark', () => {
     const fixture = TestBed.createComponent(App);
-    const httpMock = TestBed.inject(HttpTestingController);
-    httpMock.expectOne('/api/health').flush({ status: 'ok', db: 'ok' });
-    await fixture.whenStable();
+    fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Newfoot');
+    expect(compiled.querySelector('.nf-wordmark')?.textContent).toContain('newfoot');
   });
 });
