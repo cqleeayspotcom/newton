@@ -20,6 +20,13 @@
       />
     </div>
 
+    <div class="nf-insole__viewer">
+      <nf-insole-viewer [spec]="spec()" />
+      <p class="nf-insole__hint" data-testid="insole-viewer-hint">
+        Drag to rotate · scroll to zoom
+      </p>
+    </div>
+
     <div class="nf-card" data-testid="insole-spec">
       <div class="nf-card__row"><span>Size</span><b>EU {{ spec().footSizeEu }} · {{ spec().lengthMm }}×{{ spec().widthMm }} mm</b></div>
       <div class="nf-card__row"><span>Arch support</span><b>{{ spec().archHeightMm }} mm</b></div>

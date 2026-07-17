@@ -575,3 +575,38 @@ NEXT (HACKATHON DELIVERY track): interactive 3D insole — F090 (parametric Thre
 insole mesh from the recommended spec), then F091 rotate / F092 zoom, then STL export
 F098/F099. Requires adding `three` + `@types/three` to the frontend. LLM agent/chatbot
 features remain BLOCKED until AKASHML_API_KEY is set.
+
+────────────────────────────────────────────────────────────────────────────
+SESSION: F090/F091/F092 — Interactive 3D insole viewer (Three.js)
+- Added `three`@0.185.1 + `@types/three` to the frontend (installed into the
+  container volume + saved to frontend/package.json so the image build picks it up).
+- New frontend/src/app/insole/insole-mesh.ts: `buildInsoleGeometry(spec, side)`
+  builds a WATERTIGHT solid heightfield from the rule-engine InsoleSpec — footbed
+  outline that tapers heel→toe (rounded heel, midfoot waist, toe taper), a raised
+  medial arch, a cupped heel rim, and an optional heel-wedge tilt. Closed manifold
+  (top heightfield + flat bottom + perimeter walls) so it's reusable for the coming
+  STL export (F098/F099); `side:'right'` mirrors across the width axis.
+- New insole-viewer.ts standalone component `<nf-insole-viewer [spec]>`: Three.js
+  WebGLRenderer + OrbitControls (F091 drag-rotate, F092 scroll/pinch-zoom, pan off),
+  MeshStandardMaterial + key/fill/ambient lights, ResizeObserver, camera framed to
+  the model's bounding sphere so the whole insole fits with margin. Rebuilds the mesh
+  reactively when the spec (foot size / findings) changes; disposes GL resources on
+  destroy. Exposes orbit state on data-az / data-dist for the smoke assertions.
+- Wired into insole.html above the spec card with a "Drag to rotate · scroll to zoom"
+  hint; styles in insole.scss.
+- VERIFIED end-to-end through the browser (real-person fake camera person.y4m): real
+  scan → live findings → /insole → the recommended insole renders as an interactive
+  Three.js model; scrolling reduces camera distance within limits (zoom), dragging
+  changes the orbit azimuth (rotate). Screenshot: logs/screens/f090-insole-3d-viewer.png
+  (clean default 3/4 framing of the foot-shaped mesh with visible thickness).
+- Smoke: smoke/tests/f090-insole-3d-viewer.spec.ts. Full suite 16/16 green. 0 console errors.
+- Gotcha: TS `noPropertyAccessFromIndexSignature` — write dataset test hooks with
+  bracket notation (el.dataset['az']); dot access fails the Angular compile (esbuild
+  still serves the last good build, masking the change).
+
+FEATURE LIST: F090, F091, F092 → passes:true (15/210 passing).
+
+NEXT (HACKATHON DELIVERY track): STL export — F098 (watertight BINARY STL of the left
+insole via STLExporter + download, validate with tools/stl_check.js) then F099
+(mirrored right-foot STL). buildInsoleGeometry already yields a watertight solid ready
+for export. LLM agent/chatbot features remain BLOCKED until AKASHML_API_KEY is set.

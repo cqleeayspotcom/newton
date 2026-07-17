@@ -1048,7 +1048,7 @@
         "Assert no WebGL errors in the console.",
         "Screenshot the 3D viewer."
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "F091",
@@ -1060,7 +1060,7 @@
         "Capture again and assert the rendering changed, proving rotation.",
         "Screenshot the rotated model."
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "F092",
@@ -1072,7 +1072,7 @@
         "Continue zooming past the limit and assert the model never clips through or disappears.",
         "Screenshot the zoomed state."
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "F093",
