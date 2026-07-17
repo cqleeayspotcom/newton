@@ -35,6 +35,17 @@
   display: block;
 }
 
+.nf-capture__overlay-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /* Match the video's cover crop + mirror so the skeleton lines up. */
+  object-fit: cover;
+  transform: scaleX(-1);
+  pointer-events: none;
+}
+
 .nf-capture__overlay {
   position: absolute;
   inset: 0;

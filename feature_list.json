@@ -412,7 +412,7 @@
         "In page context assert the app reports 33 detected landmarks (via a data attribute or debug hook).",
         "Take a screenshot showing the skeleton drawn over the body."
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "F036",

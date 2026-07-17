@@ -4,7 +4,11 @@
     Stand back so your whole body is in frame, facing the camera straight on.
   </p>
 
-  <div class="nf-capture__stage" [attr.data-state]="state()">
+  <div
+    class="nf-capture__stage"
+    [attr.data-state]="state()"
+    [attr.data-landmarks]="landmarkCount()"
+  >
     <video
       #video
       class="nf-capture__video"
@@ -13,6 +17,13 @@
       playsinline
       muted
     ></video>
+
+    <!-- F035 — 33-landmark skeleton overlay drawn over the live preview. -->
+    <canvas
+      #overlay
+      class="nf-capture__overlay-canvas"
+      data-testid="skeleton-overlay"
+    ></canvas>
 
     @if (state() !== 'live') {
       <div class="nf-capture__overlay" data-testid="capture-overlay">
@@ -60,6 +71,18 @@
           idle
         }
       }
+    </span>
+  </p>
+
+  <p class="nf-capture__status" data-testid="skeleton">
+    Skeleton:
+    <span
+      class="nf-badge"
+      [class.nf-badge--ok]="landmarkCount() > 0"
+      [attr.data-landmarks]="landmarkCount()"
+      data-testid="landmark-count"
+    >
+      {{ landmarkCount() > 0 ? landmarkCount() + ' landmarks tracked' : 'no person detected' }}
     </span>
   </p>
 

@@ -92,4 +92,11 @@ export class PoseEngine {
   get ready(): boolean {
     return this.landmarker !== null;
   }
+
+  /**
+   * The BlazePose 33-landmark skeleton topology (pairs of landmark indices that
+   * form a bone). Used by F035 to draw connecting lines over the live preview.
+   */
+  readonly connections: ReadonlyArray<{ start: number; end: number }> =
+    PoseLandmarker.POSE_CONNECTIONS;
 }
