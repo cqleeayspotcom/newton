@@ -28,16 +28,27 @@
     </div>
 
     <div class="nf-insole__export" data-testid="insole-export">
-      <button
-        type="button"
-        class="nf-cta"
-        (click)="downloadStl('left')"
-        data-testid="stl-download-left"
-      >
-        ⬇ Download left insole (STL)
-      </button>
-      <p class="nf-insole__export-note">
-        Print-ready binary STL for the left foot.
+      <div class="nf-insole__export-buttons">
+        <button
+          type="button"
+          class="nf-cta"
+          (click)="downloadStl('left')"
+          data-testid="stl-download-left"
+        >
+          ⬇ Download left insole (STL)
+        </button>
+        <button
+          type="button"
+          class="nf-cta"
+          (click)="downloadStl('right')"
+          data-testid="stl-download-right"
+        >
+          ⬇ Download right insole (STL)
+        </button>
+      </div>
+      <p class="nf-insole__export-note" data-testid="insole-export-note">
+        Print-ready binary STL for each foot. The right insole is
+        <b>mirrored from the left model</b>.
       </p>
     </div>
 
