@@ -1,0 +1,14 @@
+{
+  "browser": {
+    "browserName": "chromium",
+    "launchOptions": {
+      "args": [
+        "--use-fake-ui-for-media-stream",
+        "--use-fake-device-for-media-stream",
+        "--use-file-for-fake-video-capture=tools/test_media/front.y4m"
+      ]
+    }
+  },
+  "capabilities": ["core", "tabs", "wait", "files"],
+  "outputDir": "logs/screens"
+}

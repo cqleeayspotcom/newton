@@ -1,0 +1,54 @@
+<header class="nf-header">
+  <span class="nf-wordmark">newfoot</span>
+  <span class="nf-tag">POC</span>
+</header>
+
+<main class="nf-main" data-testid="app-shell">
+  <section class="nf-hero">
+    <h1>Newfoot</h1>
+    <p class="nf-lede">
+      Camera-based posture analysis &amp; corrective insole recommendation.
+    </p>
+
+    <div class="nf-status" data-testid="stack-status">
+      <div class="nf-status__row">
+        <span>Frontend</span>
+        <span class="nf-badge nf-badge--ok" data-testid="status-frontend">ready</span>
+      </div>
+      <div class="nf-status__row">
+        <span>Backend API</span>
+        <span
+          class="nf-badge"
+          [class.nf-badge--ok]="backend() === 'ok'"
+          [class.nf-badge--down]="backend() === 'down'"
+          data-testid="status-backend"
+          >{{ backend() }}</span
+        >
+      </div>
+      <div class="nf-status__row">
+        <span>Database</span>
+        <span
+          class="nf-badge"
+          [class.nf-badge--ok]="db() === 'ok'"
+          [class.nf-badge--down]="db() === 'down'"
+          data-testid="status-db"
+          >{{ db() }}</span
+        >
+      </div>
+    </div>
+
+    <p class="nf-skeleton-note">
+      Skeleton ready — product features are built one per session (see
+      <code>feature_list.json</code>).
+    </p>
+  </section>
+
+  <router-outlet />
+</main>
+
+<footer class="nf-footer">
+  <p class="nf-disclaimer">
+    Wellness &amp; visualization POC — not medical advice. Consult a healthcare
+    professional.
+  </p>
+</footer>

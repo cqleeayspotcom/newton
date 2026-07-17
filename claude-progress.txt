@@ -1,0 +1,61 @@
+NEWFOOT — SESSION JOURNAL
+=========================
+Narrative memory across sessions. Newest entry at the bottom. Each coding session
+appends: feature worked on, how it was verified, screenshots, smoke status, cost.
+
+-------------------------------------------------------------------------------
+SESSION 000 — INITIALIZER (session 0)  ·  2026-07-17  ·  model: claude-opus-4-8
+             (research/tool drafting delegated to claude-fable-5 subagents)
+-------------------------------------------------------------------------------
+ROLE: Built the harness/environment. NO product features (by design).
+
+DELIVERED:
+- docs/research.md — pose SOTA. Decision: MediaPipe Pose Landmarker
+  (@mediapipe/tasks-vision 0.10.35), 33 landmarks + 3D world landmarks, 100%
+  client-side. Per-view posture metrics + threshold table. Filament: TPU 95A
+  default (0.2mm, 20% gyroid, 235/55C). Cited.
+- docs/insole-rules.md — testable rule table: findings+foot size → insole params
+  (arch height, heel wedge, heel cup, thickness, stiffness, material, print
+  settings) with neutral baseline + 3 worked JSON fixtures + severity bands.
+- feature_list.json — 165 features (F001–F165), 25 categories, all passes:false.
+  Includes error/empty/responsive/dark-mode/a11y/disclaimer/observability.
+- Skeleton: Angular 22 (standalone+signals) frontend + NestJS 11 backend
+  (mysql2, pino, /api prefix) + MySQL 8.4. Empty shell renders; /api reverse-proxy
+  and DB wiring proven by an in-browser status card (all green).
+- Dockerized: docker-compose (frontend/backend/mysql, volume, healthchecks).
+  init.sh (idempotent: build → wait health → migrate → print URLs + ngrok cmd).
+- Tools: tools/db.sh (migrate/status/reset/seed via mysql container),
+  tools/stl_check.js (zero-dep binary-STL validator; --selftest OK),
+  tools/pose_fixtures/ (7 fixtures + README, arithmetic re-verified),
+  tools/test_media/*.y4m (synthetic fake-camera clips + generator),
+  tools/expose.sh (ngrok --host-header=rewrite).
+- Harness: prompts/initializer.md, prompts/coding_agent.md, run_loop.sh (headless
+  loop, stream-json logs, dirty-repo guard, per-session cost + passing count;
+  default model claude-fable-5, overridable), .mcp.json (Playwright MCP),
+  smoke/ Playwright suite + skeleton guard test, docs/decisions.md (7 ADRs).
+
+VERIFIED:
+- ./init.sh → stack healthy: mysql healthy, backend /api/health {status:ok,db:ok},
+  migration 001_init.sql applied, frontend up on :4200.
+- /api proxy through :4200 returns backend health (single-tunnel path works).
+- smoke suite GREEN: 1 passed — skeleton shell renders in real Chromium, all
+  status badges "ok", disclaimer visible, zero console errors.
+  Screenshot: smoke/test-results/skeleton-shell.png.
+- tools/stl_check.js --selftest → SELFTEST OK. pose_fixtures manifest → 7 fixtures.
+
+NEXT (for the first coding session):
+- Run ./init.sh + `cd smoke && npm test` (green) to confirm baseline.
+- Pick the highest-priority passes:false feature (start ~F001 foundation /
+  design-system / logo-branding). Build ONE, verify in browser, add a smoke test,
+  flip passes:true, commit, append here.
+- Early priorities that unblock others: design-system tokens (F00x), app
+  layout/navigation + routing, then camera permission + MediaPipe load, then the
+  3-view wizard scaffold.
+
+NOTES / GOTCHAS:
+- Local Node is 24.11 (< Angular 22's 24.15 requirement) — scaffold/run Angular via
+  Docker or a node:24 image, not host node directly.
+- Fake-camera y4m clips are synthetic (no human) → camera UI verifiable, landmark
+  detection is NOT; use pose_fixtures for metric math. Drop a real y4m to exercise
+  the full pipeline in-browser.
+- Camera requires HTTPS (secure context) — use ngrok; plain http LAN IP won't work.

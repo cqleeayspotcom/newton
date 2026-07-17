@@ -1,0 +1,37 @@
+[
+  {
+    "file": "front_neutral.json",
+    "view": "front",
+    "expectedFindings": 0
+  },
+  {
+    "file": "front_shoulder_tilt.json",
+    "view": "front",
+    "expectedFindings": 1
+  },
+  {
+    "file": "front_knee_valgus_left.json",
+    "view": "front",
+    "expectedFindings": 1
+  },
+  {
+    "file": "side_neutral.json",
+    "view": "side",
+    "expectedFindings": 0
+  },
+  {
+    "file": "side_forward_head.json",
+    "view": "side",
+    "expectedFindings": 2
+  },
+  {
+    "file": "back_neutral.json",
+    "view": "back",
+    "expectedFindings": 0
+  },
+  {
+    "file": "back_overpronation_right.json",
+    "view": "back",
+    "expectedFindings": 1
+  }
+]

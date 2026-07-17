@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Env / secrets (committed template is .env.example)
+.env
+
+# Build output
+frontend/dist/
+frontend/.angular/
+backend/dist/
+backend/coverage/
+
+# Playwright / smoke artifacts
+smoke/node_modules/
+smoke/playwright-report/
+smoke/test-results/
+
+# Logs & run artifacts (keep the directory structure via .gitkeep)
+logs/**
+!logs/.gitkeep
+!logs/screens/.gitkeep
+!logs/app/.gitkeep
+
+# OS / editor
+.DS_Store
+*.log

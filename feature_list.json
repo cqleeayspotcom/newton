@@ -1,0 +1,1929 @@
+{
+  "version": 1,
+  "features": [
+    {
+      "id": "F001",
+      "category": "foundation",
+      "description": "The Newfoot single-page app loads at the root URL with the page title 'Newfoot' and no console errors.",
+      "steps": [
+        "Navigate to the app root URL.",
+        "Assert the document title contains 'Newfoot'.",
+        "Assert the Angular app shell (header and main content area) is visible.",
+        "Check the browser console and assert there are no error-level messages.",
+        "Take a screenshot of the loaded home page."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F002",
+      "category": "foundation",
+      "description": "Backend API is reachable through the frontend origin at /api so the whole app works over a single ngrok tunnel.",
+      "steps": [
+        "Navigate to the app root URL.",
+        "Fetch '/api/health' from the same origin via the browser (e.g. window.fetch in page context).",
+        "Assert the response status is 200 and the JSON body contains a status field equal to 'ok'.",
+        "Assert no CORS error appears in the console."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F003",
+      "category": "foundation",
+      "description": "Deep links survive a full page refresh: reloading any route (e.g. /wizard) re-renders that route instead of a 404.",
+      "steps": [
+        "Navigate to the app root and click the CTA to open the wizard route.",
+        "Assert the URL path is '/wizard' (or equivalent) and wizard content is visible.",
+        "Trigger a full browser reload on that URL.",
+        "Assert the wizard page renders again (no server 404 and no blank page)."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F004",
+      "category": "foundation",
+      "description": "The dockerized stack serves the app end-to-end: frontend, backend, and database all up from one docker-compose environment.",
+      "steps": [
+        "Navigate to the app URL exposed by the docker-compose stack.",
+        "Assert the home page renders.",
+        "Fetch '/api/health' and assert the JSON reports database connectivity as healthy.",
+        "Take a screenshot as evidence the full stack is serving."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F005",
+      "category": "foundation",
+      "description": "The app is served over HTTPS through the ngrok tunnel and reports a secure context so camera APIs are available.",
+      "steps": [
+        "Navigate to the ngrok HTTPS URL of the app.",
+        "In page context evaluate 'window.isSecureContext' and assert it is true.",
+        "Evaluate 'typeof navigator.mediaDevices?.getUserMedia' and assert it is 'function'.",
+        "Assert the browser address bar context is https (page URL starts with https://)."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F006",
+      "category": "design-system",
+      "description": "A distinctive typography system is applied: a branded display font for headings and a readable body font, loaded without FOUC fallback errors.",
+      "steps": [
+        "Navigate to the home page.",
+        "Evaluate getComputedStyle on an h1 and on body text; assert the heading font-family differs from the default serif/sans stack and matches the brand font.",
+        "Assert font sizes follow a visible scale (h1 computed size > h2 > body).",
+        "Take a screenshot showing headings and body copy together."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F007",
+      "category": "design-system",
+      "description": "A coherent brand color system is used across the UI: primary, accent, and semantic colors applied via CSS custom properties.",
+      "steps": [
+        "Navigate to the home page.",
+        "Evaluate getComputedStyle(document.documentElement).getPropertyValue for '--color-primary' (or equivalent token) and assert it returns a non-empty color.",
+        "Assert the primary CTA button background matches the primary token color.",
+        "Take a screenshot of a screen showing primary and accent colors in use."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F008",
+      "category": "design-system",
+      "description": "Buttons have distinct visual states: default, hover, focus-visible, and disabled are all visually differentiated.",
+      "steps": [
+        "Navigate to a page with a primary button (e.g. home CTA).",
+        "Screenshot the button at rest, then hover it and screenshot again; assert the two screenshots differ (background or elevation change).",
+        "Focus the button via keyboard Tab and assert a visible focus ring is present.",
+        "Locate a disabled button (e.g. wizard 'Continue' before capture) and assert it has reduced opacity or disabled styling and does not respond to click."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F009",
+      "category": "design-system",
+      "description": "Card components with consistent radius, elevation, and padding are used for report items, view selection, and insole zones.",
+      "steps": [
+        "Navigate to the wizard view-selection screen.",
+        "Assert the three view cards share identical computed border-radius and padding.",
+        "Navigate to a deficiency report and assert report items use the same card treatment.",
+        "Take a screenshot of both screens for visual comparison."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F010",
+      "category": "design-system",
+      "description": "Purposeful motion: route transitions and card entrances animate smoothly (fade/slide) rather than popping in.",
+      "steps": [
+        "Navigate from the home page to the wizard.",
+        "Assert a CSS transition or animation is applied to the entering view (check computed animation/transition properties or capture two frames showing intermediate opacity).",
+        "Assert the animation completes within ~500ms and the page is fully interactive afterwards.",
+        "Take a screenshot of the settled page."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F011",
+      "category": "design-system",
+      "description": "Form inputs (text, select, radio) share consistent branded styling with clear labels and focus states.",
+      "steps": [
+        "Navigate to the foot size form.",
+        "Assert each input has a visible associated label.",
+        "Focus an input and assert its border/outline changes to the brand focus style.",
+        "Take a screenshot of the styled form."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F012",
+      "category": "design-system",
+      "description": "A toast/snackbar component surfaces transient feedback (e.g. 'Analysis saved') with auto-dismiss.",
+      "steps": [
+        "Complete an action that saves data (e.g. accept a captured view so it persists to the backend).",
+        "Assert a toast appears with a confirmation message.",
+        "Wait up to 6 seconds and assert the toast auto-dismisses.",
+        "Take a screenshot while the toast is visible."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F013",
+      "category": "design-system",
+      "description": "A consistent spacing rhythm is applied: page sections use a spacing scale so screens do not look cramped or uneven.",
+      "steps": [
+        "Navigate to the home page and to the report page.",
+        "Evaluate computed margins/gaps between main sections and assert they use consistent step values (e.g. multiples of a base unit like 8px).",
+        "Take full-page screenshots of both pages and visually confirm even vertical rhythm."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F014",
+      "category": "logo-branding",
+      "description": "The Newfoot logo renders as an inline SVG in the app header on every page.",
+      "steps": [
+        "Navigate to the home page and assert an <svg> logo element is present inside the header.",
+        "Navigate to the wizard and the insole page and assert the same header logo is present.",
+        "Assert the SVG has an accessible name (title element or aria-label containing 'Newfoot').",
+        "Take a screenshot of the header."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F015",
+      "category": "logo-branding",
+      "description": "The favicon is the Newfoot mark served as SVG and appears in the browser tab.",
+      "steps": [
+        "Navigate to the app root.",
+        "Assert a <link rel='icon'> pointing to an .svg asset exists in the document head.",
+        "Fetch the favicon URL and assert it returns 200 with an SVG content type.",
+        "Take a screenshot including the browser tab strip if available."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F016",
+      "category": "logo-branding",
+      "description": "Clicking the header logo navigates back to the home page from anywhere in the app.",
+      "steps": [
+        "Navigate to the deficiency report page (or any deep route).",
+        "Click the header logo.",
+        "Assert the URL is the root and the home hero is visible."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F017",
+      "category": "logo-branding",
+      "description": "The home page hero presents the brand: logo lockup, product name, one-line value proposition, and primary CTA.",
+      "steps": [
+        "Navigate to the home page.",
+        "Assert the hero shows the Newfoot name, a tagline describing posture analysis and insoles, and a 'Start' CTA button.",
+        "Take a screenshot of the hero."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F018",
+      "category": "logo-branding",
+      "description": "The logo remains legible in both light and dark themes (adapts color or uses a theme-safe variant).",
+      "steps": [
+        "Navigate to the home page in light mode and screenshot the header logo.",
+        "Switch to dark mode via the theme toggle.",
+        "Assert the logo is still visible with sufficient contrast against the dark header (its fill differs from the header background).",
+        "Screenshot the dark-mode header."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F019",
+      "category": "layout-navigation",
+      "description": "A sticky app header stays visible while scrolling and contains logo, navigation, and theme toggle.",
+      "steps": [
+        "Navigate to a long page (e.g. full report).",
+        "Scroll to the bottom of the page.",
+        "Assert the header is still visible at the top of the viewport (position sticky/fixed).",
+        "Assert logo, nav links, and theme toggle are inside the header."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F020",
+      "category": "layout-navigation",
+      "description": "Primary navigation links reach the three core areas: Posture Scan, My Insole, and About/Disclaimer.",
+      "steps": [
+        "Navigate to the home page.",
+        "Click the 'Posture Scan' nav item and assert the wizard route renders.",
+        "Click the 'My Insole' nav item and assert the insole area renders.",
+        "Click the 'About' or 'Disclaimer' nav item and assert that page renders."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F021",
+      "category": "layout-navigation",
+      "description": "The active navigation item is visually highlighted to reflect the current route.",
+      "steps": [
+        "Navigate to the wizard route.",
+        "Assert the 'Posture Scan' nav item has an active style (e.g. aria-current='page' or distinct class/color).",
+        "Navigate to the insole route and assert the highlight moves accordingly."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F022",
+      "category": "layout-navigation",
+      "description": "A footer on every page contains the medical disclaimer link, an about link, and the app version.",
+      "steps": [
+        "Navigate to the home page and scroll to the footer.",
+        "Assert the footer contains a link to the full disclaimer page and a visible version string.",
+        "Repeat on the report page and assert the same footer renders."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F023",
+      "category": "layout-navigation",
+      "description": "Unknown routes show a branded 404 page with a link back home.",
+      "steps": [
+        "Navigate directly to '/this-route-does-not-exist'.",
+        "Assert a styled 'Page not found' screen renders (not a blank page or raw server error).",
+        "Click the 'Back to home' link and assert the home page loads."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F024",
+      "category": "layout-navigation",
+      "description": "Browser back/forward navigation works through the wizard steps without losing captured progress.",
+      "steps": [
+        "Start the wizard, complete the FRONT view capture, and continue to the SIDE view.",
+        "Press the browser Back button and assert the app returns to the previous wizard state without a full reload.",
+        "Press Forward and assert the SIDE step is restored.",
+        "Assert the FRONT view still shows as completed in the progress indicator."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F025",
+      "category": "layout-navigation",
+      "description": "The home page shows a clear two-step journey overview: '1. Scan your posture' then '2. Get your insole', each linking to its flow.",
+      "steps": [
+        "Navigate to the home page.",
+        "Assert two journey cards/sections are visible describing the scan step and the insole step.",
+        "Click the scan card and assert the wizard opens; go back and click the insole card and assert the insole area opens."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F026",
+      "category": "camera",
+      "description": "Opening a wizard capture step requests camera access and shows the live preview once granted.",
+      "steps": [
+        "Launch the browser with the fake-camera test video (e.g. --use-fake-device-for-media-stream and --use-fake-ui-for-media-stream with the test file).",
+        "Navigate to the wizard FRONT capture step.",
+        "Assert a <video> element becomes visible and is playing (readyState >= 2, videoWidth > 0).",
+        "Take a screenshot showing the live preview."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F027",
+      "category": "camera",
+      "description": "While the camera initializes, a loading indicator with a 'Starting camera…' message is shown instead of a black box.",
+      "steps": [
+        "Navigate to the wizard capture step with the fake camera enabled.",
+        "Immediately assert a spinner or skeleton with camera-starting copy is visible before the stream is ready.",
+        "Wait for the preview and assert the loading indicator is replaced by the live video."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F028",
+      "category": "camera",
+      "description": "The camera preview is mirrored for front-facing use, with a mirror toggle to flip it.",
+      "steps": [
+        "Open the capture step with the fake camera.",
+        "Assert the video element has a horizontal mirror transform applied by default.",
+        "Click the mirror toggle and assert the transform is removed.",
+        "Take screenshots in both states."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F029",
+      "category": "camera",
+      "description": "A camera-facing toggle lets the user switch between front and rear camera (facingMode), keeping the preview running.",
+      "steps": [
+        "Open the capture step with the fake camera.",
+        "Assert a camera-switch button is visible.",
+        "Click it and assert the preview restarts and continues playing (videoWidth > 0 after switch).",
+        "Assert no unhandled error toast appears."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F030",
+      "category": "camera",
+      "description": "Leaving the capture screen stops the camera stream (no lingering recording).",
+      "steps": [
+        "Open the capture step with the fake camera and confirm the preview is playing.",
+        "Navigate back to the home page.",
+        "In page context assert the previous MediaStream tracks report readyState 'ended' (app exposes this via the video element or a debug hook).",
+        "Assert no <video> element with an active stream remains in the DOM."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F031",
+      "category": "camera",
+      "description": "The preview maintains correct aspect ratio without distortion in both portrait and landscape viewports.",
+      "steps": [
+        "Open the capture step with the fake camera at a desktop viewport and assert the video is not stretched (element aspect ratio matches videoWidth/videoHeight).",
+        "Resize the viewport to 390x844 (phone portrait).",
+        "Assert the preview letterboxes or crops gracefully with no distortion and controls remain visible.",
+        "Screenshot both viewports."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F032",
+      "category": "camera",
+      "description": "On plain http (insecure context) the capture step shows a clear explanation that the camera requires HTTPS, with the ngrok URL hint, instead of failing silently.",
+      "steps": [
+        "Navigate to the app over http:// (insecure origin) if available, or simulate isSecureContext=false.",
+        "Open the wizard capture step.",
+        "Assert a friendly message explains the camera needs a secure (HTTPS) connection and no broken video element is shown.",
+        "Take a screenshot of the message."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F033",
+      "category": "camera",
+      "description": "A capture-quality hint bar tells the user to step back until their full body is in frame.",
+      "steps": [
+        "Open the FRONT capture step with the fake-camera test video.",
+        "Assert a hint message about framing the full body is visible above or below the preview.",
+        "Assert the hint updates or disappears once a full-body pose is detected in the test video.",
+        "Screenshot the hint state."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F034",
+      "category": "pose-engine",
+      "description": "The MediaPipe Pose Landmarker loads client-side with a visible model-loading progress state before detection starts.",
+      "steps": [
+        "Open the wizard capture step with the fake camera.",
+        "Assert a 'Loading pose model…' indicator appears while the model initializes.",
+        "Wait until the indicator resolves and assert a 'Pose engine ready' state or the skeleton overlay becomes active.",
+        "Assert no console errors related to model loading."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F035",
+      "category": "pose-engine",
+      "description": "A real-time skeleton overlay (33 landmarks with connecting bones) is drawn over the live preview.",
+      "steps": [
+        "Open the capture step with the fake-camera test video showing a person.",
+        "Wait for detection and assert an overlay canvas is rendered above the video.",
+        "In page context assert the app reports 33 detected landmarks (via a data attribute or debug hook).",
+        "Take a screenshot showing the skeleton drawn over the body."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F036",
+      "category": "pose-engine",
+      "description": "The skeleton overlay tracks movement live, updating in real time as the subject moves in the test video.",
+      "steps": [
+        "Open the capture step with a fake-camera test video containing motion.",
+        "Capture the overlay canvas pixels at two timestamps 2 seconds apart.",
+        "Assert the two captures differ, proving the overlay updates with movement.",
+        "Assert the UI remains responsive (a button click registers) while tracking."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F037",
+      "category": "pose-engine",
+      "description": "A pose-detection status badge shows 'Pose detected' (green) or 'No pose' (amber) in real time.",
+      "steps": [
+        "Open the capture step with the fake-camera test video of a person and assert the badge shows a detected state.",
+        "Switch to a fake video (or cover) with no person and assert the badge flips to a no-pose state.",
+        "Screenshot both badge states."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F038",
+      "category": "pose-engine",
+      "description": "Low-confidence landmarks are visually de-emphasized (dimmed or dashed) so users see which body parts are unreliable.",
+      "steps": [
+        "Open the capture step with a test video where part of the body is out of frame.",
+        "Assert landmarks below the confidence threshold render with a visibly different style than confident ones.",
+        "Take a screenshot showing both styles."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F039",
+      "category": "pose-engine",
+      "description": "A live FPS/performance readout is available on the capture screen showing the pose pipeline frame rate.",
+      "steps": [
+        "Open the capture step with the fake camera.",
+        "Assert an FPS counter (or performance chip) is visible and shows a number greater than 0.",
+        "Wait 3 seconds and assert the value updates.",
+        "Screenshot the readout."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F040",
+      "category": "pose-engine",
+      "description": "The captured frame stores 3D landmark data, and the report can show a 'landmarks captured: 33 (3D)' confirmation detail.",
+      "steps": [
+        "Complete a FRONT capture with the fake-camera test video.",
+        "Open the per-view report or its details section.",
+        "Assert a detail line confirms 33 landmarks with 3D coordinates were captured for the analysis.",
+        "Screenshot the confirmation."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F041",
+      "category": "wizard",
+      "description": "The wizard entry screen presents three view cards — FRONT, SIDE, BACK — each with an illustration and status.",
+      "steps": [
+        "Navigate to the wizard entry route.",
+        "Assert three cards labeled FRONT, SIDE, and BACK are visible, each with an illustration and a 'Not captured' status.",
+        "Take a screenshot of the entry screen."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F042",
+      "category": "wizard",
+      "description": "Selecting the FRONT view opens the FRONT capture flow with view-specific instructions.",
+      "steps": [
+        "From the wizard entry, click the FRONT card.",
+        "Assert the capture screen opens showing 'Front view' in the step heading.",
+        "Assert instructions mention facing the camera straight on.",
+        "Screenshot the instruction state."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F043",
+      "category": "wizard",
+      "description": "A human silhouette alignment guide overlays the camera preview so users can position themselves correctly for the selected view.",
+      "steps": [
+        "Open the FRONT capture step with the fake camera.",
+        "Assert a semi-transparent silhouette outline overlay is rendered over the preview.",
+        "Switch to the SIDE view capture and assert the silhouette changes to a profile outline.",
+        "Screenshot both silhouettes."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F044",
+      "category": "wizard",
+      "description": "A countdown capture mode counts down 3-2-1 with large on-screen numbers and then freezes the captured frame.",
+      "steps": [
+        "Open the FRONT capture step with the fake camera and click 'Capture with countdown'.",
+        "Assert large countdown digits appear and change each second.",
+        "After the countdown, assert the preview freezes into a captured still frame.",
+        "Screenshot the frozen frame."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F045",
+      "category": "wizard",
+      "description": "A live analysis mode continuously analyzes posture without capturing, showing metrics update in real time.",
+      "steps": [
+        "Open the capture step with the fake camera and switch on 'Live mode'.",
+        "Assert live posture metrics (e.g. shoulder tilt angle) are displayed and updating while the video plays.",
+        "Assert no capture is stored (progress still shows the view as not captured).",
+        "Switch live mode off and assert the metrics panel returns to idle."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F046",
+      "category": "wizard",
+      "description": "After capture, the frozen frame shows the skeleton overlay baked onto it for review.",
+      "steps": [
+        "Complete a countdown capture on the FRONT view with the fake camera.",
+        "Assert the still frame displays the detected skeleton overlay on the body.",
+        "Screenshot the reviewed capture."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F047",
+      "category": "wizard",
+      "description": "A 'Retake' button on the capture review discards the frame and returns to the live preview.",
+      "steps": [
+        "Complete a FRONT capture and land on the review state.",
+        "Click 'Retake'.",
+        "Assert the live camera preview resumes and the previous still is gone.",
+        "Assert the view status remains 'Not captured' until accepted."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F048",
+      "category": "wizard",
+      "description": "An 'Accept' action on the capture review saves the view analysis and advances the wizard.",
+      "steps": [
+        "Complete a FRONT capture and click 'Accept'.",
+        "Assert a saving confirmation appears and the wizard advances (next step or per-view report).",
+        "Assert the FRONT view now shows a completed status in the progress indicator."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F049",
+      "category": "wizard",
+      "description": "The SIDE view flow works end-to-end: profile silhouette, capture, review, accept.",
+      "steps": [
+        "From the wizard, select the SIDE view.",
+        "Assert the profile silhouette guide and side-specific instructions are shown.",
+        "Complete a countdown capture with the fake-camera test video, then accept it.",
+        "Assert SIDE shows as completed in the wizard progress."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F050",
+      "category": "wizard",
+      "description": "The BACK view flow works end-to-end: rear silhouette, capture, review, accept.",
+      "steps": [
+        "From the wizard, select the BACK view.",
+        "Assert back-view instructions (facing away from camera) and silhouette are shown.",
+        "Complete a capture with the fake-camera test video and accept it.",
+        "Assert BACK shows as completed in the wizard progress."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F051",
+      "category": "wizard",
+      "description": "A persistent step progress indicator shows capture state across the three views (e.g. 2 of 3 captured).",
+      "steps": [
+        "Complete FRONT and SIDE captures.",
+        "Assert the progress indicator shows those two views completed and BACK pending, with a '2/3' style summary.",
+        "Screenshot the progress indicator."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F052",
+      "category": "wizard",
+      "description": "Completing all three views lands on a completion screen summarizing the scan and offering 'View full report' and 'Get my insole' actions.",
+      "steps": [
+        "Complete FRONT, SIDE, and BACK captures with the fake camera.",
+        "Assert a completion screen appears congratulating the user with all three views marked done.",
+        "Assert buttons 'View full report' and 'Get my insole' are visible and navigate correctly when clicked.",
+        "Screenshot the completion screen."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F053",
+      "category": "posture-metrics",
+      "description": "The FRONT report shows the shoulder tilt angle in degrees with a normal/deviated classification.",
+      "steps": [
+        "Complete a FRONT capture with the fake-camera test video and open the FRONT report.",
+        "Assert a 'Shoulder tilt' metric row displays a numeric angle with a degree unit.",
+        "Assert a classification badge (e.g. Normal / Mild / Marked) is shown next to the value.",
+        "Screenshot the metric row."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F054",
+      "category": "posture-metrics",
+      "description": "The FRONT report shows the pelvic tilt (iliac/hip line) angle with classification.",
+      "steps": [
+        "Open the FRONT report after capture.",
+        "Assert a 'Pelvic tilt' metric shows a numeric degree value and a threshold-based badge.",
+        "Screenshot the metric."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F055",
+      "category": "posture-metrics",
+      "description": "The FRONT report shows head lateral lean relative to vertical with classification.",
+      "steps": [
+        "Open the FRONT report after capture.",
+        "Assert a 'Head lean' metric displays degrees from vertical with a classification badge.",
+        "Screenshot the metric."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F056",
+      "category": "posture-metrics",
+      "description": "The FRONT report shows knee alignment (valgus/varus) per leg with classification.",
+      "steps": [
+        "Open the FRONT report after capture.",
+        "Assert knee alignment values are shown for left and right legs, each labeled valgus, varus, or neutral.",
+        "Screenshot the knee metrics."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F057",
+      "category": "posture-metrics",
+      "description": "The SIDE report shows the craniovertebral (forward-head) angle with classification.",
+      "steps": [
+        "Complete a SIDE capture with the fake camera and open the SIDE report.",
+        "Assert a 'Forward head' metric shows the craniovertebral angle in degrees with a badge.",
+        "Screenshot the metric."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F058",
+      "category": "posture-metrics",
+      "description": "The SIDE report shows thoracic slump (rounded upper back) with classification.",
+      "steps": [
+        "Open the SIDE report after capture.",
+        "Assert a 'Thoracic slump' metric displays a value with a classification badge.",
+        "Screenshot the metric."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F059",
+      "category": "posture-metrics",
+      "description": "The BACK report shows spine lateral deviation with classification.",
+      "steps": [
+        "Complete a BACK capture with the fake camera and open the BACK report.",
+        "Assert a 'Spine lateral deviation' metric shows a value and badge.",
+        "Screenshot the metric."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F060",
+      "category": "posture-metrics",
+      "description": "The BACK report shows rearfoot pronation/supination per foot with classification.",
+      "steps": [
+        "Open the BACK report after capture.",
+        "Assert rearfoot alignment values for left and right feet are labeled pronation, supination, or neutral.",
+        "Screenshot the foot metrics."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F061",
+      "category": "posture-metrics",
+      "description": "Each metric row exposes its threshold on demand (tooltip or expander) so users see why a value is classified as deviated.",
+      "steps": [
+        "Open any per-view report.",
+        "Click the info affordance on a metric row.",
+        "Assert the threshold range (e.g. 'Normal: below 2°') is displayed.",
+        "Screenshot the expanded explanation."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F062",
+      "category": "posture-metrics",
+      "description": "Metric severity uses consistent color coding across all views (e.g. green normal, amber mild, red marked).",
+      "steps": [
+        "Open the FRONT and SIDE reports.",
+        "Assert badges of the same classification level share the same color across both reports.",
+        "Assert at least two different severity colors are distinguishable in the test data.",
+        "Screenshot both reports for comparison."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F063",
+      "category": "deficiency-report",
+      "description": "After accepting a capture, a per-view deficiency report renders with the annotated capture image and a metrics list.",
+      "steps": [
+        "Accept a FRONT capture with the fake camera.",
+        "Assert the report screen shows the captured photo thumbnail and a list of posture metrics beneath or beside it.",
+        "Screenshot the full report."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F064",
+      "category": "deficiency-report",
+      "description": "Visual annotations are drawn on the captured image: angle lines/arcs at the relevant joints for each measured metric.",
+      "steps": [
+        "Open the FRONT report.",
+        "Assert annotation graphics (lines across shoulders and hips, angle arcs) are overlaid on the capture image.",
+        "Assert each annotation is color-matched to its metric severity.",
+        "Screenshot the annotated image."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F065",
+      "category": "deficiency-report",
+      "description": "Every detected deficiency includes a plain-language explanation of what it means in everyday terms.",
+      "steps": [
+        "Open a report containing at least one deviated metric.",
+        "Expand or read the deficiency item and assert a jargon-free sentence explains the finding (e.g. 'Your left shoulder sits slightly higher than your right').",
+        "Assert the explanation avoids raw metric jargon as the only description.",
+        "Screenshot the explanation."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F066",
+      "category": "deficiency-report",
+      "description": "A per-view summary header states the count of findings (e.g. '2 findings in front view').",
+      "steps": [
+        "Open the FRONT report after capture.",
+        "Assert a summary line states how many deficiencies were detected in that view.",
+        "Screenshot the header."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F067",
+      "category": "deficiency-report",
+      "description": "When all metrics are within normal thresholds, the report shows a positive 'No significant deviations detected' state.",
+      "steps": [
+        "Complete a capture using a fake-camera test video of a well-aligned pose.",
+        "Open the per-view report.",
+        "Assert a positive all-clear message with a success visual is displayed instead of an empty findings list.",
+        "Screenshot the state."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F068",
+      "category": "deficiency-report",
+      "description": "A combined full report aggregates findings from all captured views on one screen, grouped by view.",
+      "steps": [
+        "Complete all three view captures.",
+        "Open the full report.",
+        "Assert sections for FRONT, SIDE, and BACK each list their metrics and findings.",
+        "Assert an overall summary (total findings across views) is shown at the top.",
+        "Screenshot the full report."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F069",
+      "category": "deficiency-report",
+      "description": "Each deficiency item shows a recognizable icon for the affected body area (shoulders, pelvis, head, knees, spine, feet).",
+      "steps": [
+        "Open a report with multiple findings.",
+        "Assert each finding row includes a distinct body-area icon.",
+        "Screenshot the findings list."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F070",
+      "category": "deficiency-report",
+      "description": "The full report is shareable/revisitable via URL: reloading the report page restores it for the current session.",
+      "steps": [
+        "Open the full report after completing captures.",
+        "Copy the current URL and perform a full page reload.",
+        "Assert the same report content renders after reload (data restored via session).",
+        "Screenshot the restored report."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F071",
+      "category": "reference-comparison",
+      "description": "The capture review overlays a reference-posture 'ghost' skeleton on top of the user's detected skeleton.",
+      "steps": [
+        "Complete a FRONT capture with the fake camera.",
+        "Assert two skeletons render on the still: the user's skeleton and a visually distinct ghost (dashed or translucent) representing ideal posture.",
+        "Screenshot the overlay."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F072",
+      "category": "reference-comparison",
+      "description": "The ghost skeleton is scaled and anchored to the user's body size and position so the comparison is meaningful.",
+      "steps": [
+        "Open the capture review with the ghost visible.",
+        "Assert the ghost's hip midpoint aligns with the user's hip midpoint and the ghost height approximately matches the user skeleton height (evaluate overlay geometry via debug hook or pixel positions).",
+        "Screenshot the aligned comparison."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F073",
+      "category": "reference-comparison",
+      "description": "A toggle shows/hides the reference ghost on the capture review and report screens.",
+      "steps": [
+        "Open the capture review.",
+        "Click the 'Show reference' toggle off and assert the ghost disappears while the user skeleton remains.",
+        "Toggle it back on and assert the ghost returns.",
+        "Screenshot both states."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F074",
+      "category": "reference-comparison",
+      "description": "Body segments deviating beyond threshold are highlighted in a warning color on the user skeleton, directly showing the difference from the reference.",
+      "steps": [
+        "Open a capture review with at least one deviated metric.",
+        "Assert the corresponding skeleton segment (e.g. shoulder line) is rendered in the warning color while normal segments stay neutral.",
+        "Screenshot the highlighted deviation."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F075",
+      "category": "reference-comparison",
+      "description": "A side-by-side comparison mode shows 'You' and 'Reference' panels together for the selected view.",
+      "steps": [
+        "From the report, activate the side-by-side comparison mode.",
+        "Assert two labeled panels render: the user's annotated capture and the reference posture illustration.",
+        "Screenshot the side-by-side view."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F076",
+      "category": "insole-form",
+      "description": "The insole flow starts with a foot size form asking for shoe size with an EU/US unit selector.",
+      "steps": [
+        "Navigate to the insole section after completing the scan.",
+        "Assert a form with a numeric shoe-size input and an EU/US unit toggle is visible.",
+        "Screenshot the form."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F077",
+      "category": "insole-form",
+      "description": "Switching between EU and US converts the entered size to the equivalent value automatically.",
+      "steps": [
+        "On the foot size form, enter 42 with EU selected.",
+        "Switch the unit toggle to US.",
+        "Assert the displayed size converts to the corresponding US value (approximately 8.5–9).",
+        "Switch back to EU and assert it returns to 42."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F078",
+      "category": "insole-form",
+      "description": "The form validates size bounds and shows an inline error for out-of-range values while disabling submit.",
+      "steps": [
+        "Enter an out-of-range size such as 99 (EU).",
+        "Assert an inline validation message appears explaining the accepted range.",
+        "Assert the 'Generate insole' button is disabled.",
+        "Enter 42 and assert the error clears and the button enables."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F079",
+      "category": "insole-form",
+      "description": "The form shows a read-only summary of the posture findings that will drive the insole recommendation.",
+      "steps": [
+        "Complete the scan, then open the insole form.",
+        "Assert a summary panel lists the relevant detected deficiencies (e.g. rearfoot pronation, pelvic tilt) feeding the recommendation.",
+        "Screenshot the summary."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F080",
+      "category": "insole-form",
+      "description": "An optional foot-length field (in mm/cm) refines sizing, with its own validation.",
+      "steps": [
+        "On the insole form, enter a foot length of 265 mm.",
+        "Assert the value is accepted; then enter 500 and assert a range validation error appears.",
+        "Correct to 265 and assert the form is submittable."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F081",
+      "category": "insole-form",
+      "description": "Submitting the form triggers insole generation with a progress state, then navigates to the insole result.",
+      "steps": [
+        "Fill the form with EU 42 and submit.",
+        "Assert a generating/progress indicator appears.",
+        "Assert the app navigates to the insole result screen showing the generated recommendation.",
+        "Screenshot the result landing."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F082",
+      "category": "insole-form",
+      "description": "Form values persist for the session: reloading the page restores the previously entered size and unit.",
+      "steps": [
+        "Enter EU 42 on the insole form.",
+        "Reload the page.",
+        "Assert the form shows EU 42 restored.",
+        "Assert the unit toggle reflects the saved selection."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F083",
+      "category": "insole-engine",
+      "description": "Detected rearfoot pronation produces an insole with visible medial arch support, and the UI states this mapping.",
+      "steps": [
+        "Complete a scan whose BACK analysis (fake-camera test video) yields pronation, then generate the insole.",
+        "Assert the recommendation lists a 'medial arch support' feature.",
+        "Assert the rationale text links it to the detected pronation.",
+        "Screenshot the recommendation."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F084",
+      "category": "insole-engine",
+      "description": "Detected supination produces lateral support/posting in the recommendation with matching rationale.",
+      "steps": [
+        "Generate an insole from an analysis classified as supination (use a matching test capture or seeded analysis).",
+        "Assert the recommendation includes lateral wedge/support.",
+        "Assert the rationale references supination.",
+        "Screenshot the recommendation."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F085",
+      "category": "insole-engine",
+      "description": "Pelvic tilt findings produce a heel-lift element on the appropriate side, explained in plain language.",
+      "steps": [
+        "Generate an insole from an analysis with pelvic tilt beyond threshold.",
+        "Assert the recommendation includes a heel lift with the affected side named.",
+        "Assert the explanation states it addresses the measured pelvic tilt.",
+        "Screenshot the recommendation."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F086",
+      "category": "insole-engine",
+      "description": "The generated insole is broken down into named zones (heel cup, arch support, metatarsal area, forefoot) each with its parameter values.",
+      "steps": [
+        "Open the insole result screen.",
+        "Assert a zone list shows at least heel, arch, and forefoot zones with numeric parameters (e.g. arch height in mm, heel cup depth in mm).",
+        "Screenshot the zone breakdown."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F087",
+      "category": "insole-engine",
+      "description": "The insole dimensions are parametric to the entered foot size: changing the size changes the reported insole length.",
+      "steps": [
+        "Generate an insole at EU 42 and note the displayed insole length.",
+        "Return to the form, change to EU 44, and regenerate.",
+        "Assert the displayed insole length increases accordingly.",
+        "Screenshot both results."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F088",
+      "category": "insole-engine",
+      "description": "A neutral analysis (no relevant deficiencies) yields a comfort/neutral insole recommendation, clearly labeled as such.",
+      "steps": [
+        "Generate an insole from an all-normal analysis (well-aligned test video).",
+        "Assert the result is labeled a neutral/comfort insole with no corrective posting.",
+        "Assert the rationale explains that no significant deviations were found.",
+        "Screenshot the neutral result."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F089",
+      "category": "insole-engine",
+      "description": "The recommendation screen shows a 'Why this insole' section tracing each insole feature back to a specific measured finding.",
+      "steps": [
+        "Open the insole result for an analysis with findings.",
+        "Assert a rationale section maps each corrective feature to the specific metric and angle that triggered it.",
+        "Screenshot the rationale section."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F090",
+      "category": "insole-3d",
+      "description": "The generated insole renders as an interactive 3D model in a Three.js viewer on the result screen.",
+      "steps": [
+        "Generate an insole and open the result screen.",
+        "Assert a WebGL canvas is present and a 3D insole mesh is visible (canvas has non-blank pixels).",
+        "Assert no WebGL errors in the console.",
+        "Screenshot the 3D viewer."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F091",
+      "category": "insole-3d",
+      "description": "The 3D model rotates via mouse drag (orbit controls).",
+      "steps": [
+        "Open the 3D viewer.",
+        "Capture the canvas pixels, then perform a mouse drag across the canvas.",
+        "Capture again and assert the rendering changed, proving rotation.",
+        "Screenshot the rotated model."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F092",
+      "category": "insole-3d",
+      "description": "The 3D view zooms via scroll wheel (and pinch on touch), constrained to sensible limits.",
+      "steps": [
+        "Open the 3D viewer and capture the canvas.",
+        "Dispatch wheel events to zoom in and assert the render changes (model appears larger).",
+        "Continue zooming past the limit and assert the model never clips through or disappears.",
+        "Screenshot the zoomed state."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F093",
+      "category": "insole-3d",
+      "description": "An exploded-view toggle separates the insole zones vertically with an animated transition.",
+      "steps": [
+        "Open the 3D viewer.",
+        "Click the 'Exploded view' toggle.",
+        "Assert the zones separate visibly (canvas render changes to show layered parts).",
+        "Toggle off and assert the model reassembles.",
+        "Screenshot the exploded state."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F094",
+      "category": "insole-3d",
+      "description": "Zones in the 3D model are color-coded with a matching legend naming each zone.",
+      "steps": [
+        "Open the 3D viewer with exploded view on.",
+        "Assert a legend lists zone names with color swatches.",
+        "Assert the legend colors correspond to distinct colors visible in the render.",
+        "Screenshot legend plus model."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F095",
+      "category": "insole-3d",
+      "description": "A left/right selector switches the viewer between the left insole and the mirrored right insole.",
+      "steps": [
+        "Open the 3D viewer showing the left insole.",
+        "Click the 'Right' toggle.",
+        "Assert the rendered model mirrors (capture before/after and assert the change) and the label updates to 'Right'.",
+        "Screenshot both sides."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F096",
+      "category": "insole-3d",
+      "description": "A 'Reset view' button returns the camera to the default framing after any rotation/zoom.",
+      "steps": [
+        "Open the 3D viewer, rotate and zoom the model.",
+        "Click 'Reset view'.",
+        "Assert the render returns to the initial default framing (canvas matches the initial capture within tolerance).",
+        "Screenshot the reset state."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F097",
+      "category": "insole-3d",
+      "description": "While the 3D mesh is being prepared, the viewer shows a branded loading state instead of an empty canvas.",
+      "steps": [
+        "Trigger insole generation and immediately open the result screen.",
+        "Assert a loading spinner/skeleton occupies the viewer area before the mesh appears.",
+        "Assert it is replaced by the rendered model once ready.",
+        "Screenshot the loading state."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F098",
+      "category": "stl-export",
+      "description": "A 'Download left insole (STL)' button downloads a non-empty .stl file named for the left side.",
+      "steps": [
+        "Open the insole result screen.",
+        "Click the left STL download button.",
+        "Assert a file download completes with an .stl extension and 'left' in the filename.",
+        "Assert the downloaded file size is greater than 10 KB."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F099",
+      "category": "stl-export",
+      "description": "A 'Download right insole (STL)' button downloads the mirrored right-side STL.",
+      "steps": [
+        "Open the insole result screen.",
+        "Click the right STL download button.",
+        "Assert a .stl file downloads with 'right' in the filename and non-trivial size.",
+        "Assert the UI labels it as mirrored from the left model."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F100",
+      "category": "stl-export",
+      "description": "The exported files are valid binary STL: the app surfaces a validation badge (triangle count, binary format) for each export.",
+      "steps": [
+        "Open the insole result screen.",
+        "Assert each STL entry shows a validation summary such as 'Binary STL · N triangles · watertight'.",
+        "Download the left STL and assert its byte length equals 84 + 50 × triangle count as displayed.",
+        "Screenshot the validation badges."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F101",
+      "category": "stl-export",
+      "description": "The UI confirms the meshes are watertight (manifold) so they will slice correctly, with a green check per side.",
+      "steps": [
+        "Open the insole result screen.",
+        "Assert watertight status indicators are shown for both left and right models and read as passing.",
+        "Screenshot the indicators."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F102",
+      "category": "stl-export",
+      "description": "A 'Download both (ZIP)' action packages left and right STLs plus the recommendation sheet in one archive.",
+      "steps": [
+        "Click 'Download both' on the insole result screen.",
+        "Assert a .zip file downloads.",
+        "Assert the UI describes the archive contents (left STL, right STL, recommendation PDF/sheet).",
+        "Assert the archive size exceeds the size of a single STL."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F103",
+      "category": "stl-export",
+      "description": "Exported filenames encode the size and session for traceability (e.g. newfoot-left-eu42-<session>.stl).",
+      "steps": [
+        "Download the left STL after generating an EU 42 insole.",
+        "Assert the filename contains 'left' and '42'.",
+        "Assert the filename contains a session-derived identifier."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F104",
+      "category": "stl-export",
+      "description": "STL downloads work on mobile viewport with an explanatory note about opening the file in a slicer.",
+      "steps": [
+        "Set the viewport to 390x844 and open the insole result.",
+        "Assert the download buttons are visible and tappable without horizontal scrolling.",
+        "Tap the left STL button and assert the download triggers.",
+        "Assert helper text explains the file is for 3D printing slicers."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F105",
+      "category": "recommendation-sheet",
+      "description": "A printable one-page recommendation sheet is available from the insole result, opening in a clean print-ready layout.",
+      "steps": [
+        "On the insole result screen, click 'Print sheet' or 'View recommendation sheet'.",
+        "Assert a one-page formatted sheet renders with the Newfoot branding.",
+        "Screenshot the sheet."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F106",
+      "category": "recommendation-sheet",
+      "description": "The sheet lists complete print settings: filament material, infill percentage, layer height, and print orientation.",
+      "steps": [
+        "Open the recommendation sheet.",
+        "Assert values are present for material (e.g. TPU), infill %, layer height in mm, and orientation guidance.",
+        "Screenshot the print-settings block."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F107",
+      "category": "recommendation-sheet",
+      "description": "The sheet summarizes the insole parameters and the posture findings that drove them.",
+      "steps": [
+        "Open the recommendation sheet after generating a corrective insole.",
+        "Assert the sheet lists foot size, key zone parameters, and the findings summary.",
+        "Screenshot the summary block."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F108",
+      "category": "recommendation-sheet",
+      "description": "Printing the sheet uses a dedicated print stylesheet: no header/nav chrome, fits on one page.",
+      "steps": [
+        "Open the recommendation sheet and emulate print media (or trigger window.print with print emulation).",
+        "Assert app navigation and buttons are hidden in the print rendering.",
+        "Assert the content height fits a single A4/Letter page in the print preview emulation.",
+        "Screenshot the print-emulated view."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F109",
+      "category": "recommendation-sheet",
+      "description": "The medical disclaimer is printed on the recommendation sheet itself.",
+      "steps": [
+        "Open the recommendation sheet.",
+        "Assert the 'Not medical advice — consult a healthcare professional' text is present on the sheet body (also under print emulation).",
+        "Screenshot showing the disclaimer on the sheet."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F110",
+      "category": "session-persistence",
+      "description": "On first visit an anonymous session ID is generated and stored client-side, with no login ever requested.",
+      "steps": [
+        "Open the app in a fresh browser context.",
+        "Assert no login/signup UI is presented anywhere in the primary flows.",
+        "Evaluate localStorage and assert a session ID key exists with a UUID-like value.",
+        "Reload and assert the value is unchanged."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F111",
+      "category": "session-persistence",
+      "description": "Accepted captures are persisted to the backend keyed by the session ID (observable as a successful API write).",
+      "steps": [
+        "Accept a FRONT capture with the fake camera while recording network requests.",
+        "Assert a POST/PUT to an /api analysis endpoint occurred with a 2xx response.",
+        "Assert the request payload or URL includes the session ID from localStorage."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F112",
+      "category": "session-persistence",
+      "description": "Reloading the browser restores wizard progress and reports from the backend for the same session.",
+      "steps": [
+        "Complete FRONT and SIDE captures, then fully reload the app.",
+        "Navigate to the wizard and assert FRONT and SIDE still show as completed.",
+        "Open the report and assert the persisted metrics render.",
+        "Screenshot the restored state."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F113",
+      "category": "session-persistence",
+      "description": "A returning visitor sees a 'Welcome back' resume card on the home page linking to their existing analysis.",
+      "steps": [
+        "Complete at least one capture, reload, and return to the home page.",
+        "Assert a resume card shows the previous scan status (e.g. '2 of 3 views captured') with a 'Continue' action.",
+        "Click Continue and assert the wizard opens at the right place.",
+        "Screenshot the resume card."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F114",
+      "category": "session-persistence",
+      "description": "A 'Start over' action clears the current analysis after a confirmation dialog and begins a fresh session state.",
+      "steps": [
+        "With an existing analysis, click 'Start over'.",
+        "Assert a confirmation dialog warns that current results will be cleared.",
+        "Confirm, then assert the wizard shows all three views as not captured and the report is empty.",
+        "Assert prior data no longer renders after reload."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F115",
+      "category": "session-persistence",
+      "description": "The session ID is viewable on an About/Support panel so users can reference their anonymous analysis.",
+      "steps": [
+        "Open the About page or settings panel.",
+        "Assert the anonymous session ID is displayed (possibly truncated with a copy button).",
+        "Click copy and assert a copied confirmation toast appears."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F116",
+      "category": "backend-api",
+      "description": "GET /api/health returns service status including database connectivity, consumable from the browser.",
+      "steps": [
+        "From the app origin fetch '/api/health'.",
+        "Assert status 200 and JSON containing overall status and a database status field.",
+        "Assert response time is under 2 seconds."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F117",
+      "category": "backend-api",
+      "description": "POST /api/sessions/:id/analyses stores a per-view analysis and returns 201 with the stored record.",
+      "steps": [
+        "Accept a capture in the UI while recording network traffic.",
+        "Assert the create request returned 201 (or 200) and the response JSON echoes the view name and metrics.",
+        "Assert the response contains a server-generated record id and timestamp."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F118",
+      "category": "backend-api",
+      "description": "GET /api/sessions/:id/analyses returns all stored view analyses for the session, powering report restore.",
+      "steps": [
+        "After accepting two captures, fetch the session analyses endpoint from the page context using the stored session ID.",
+        "Assert the JSON array contains entries for both captured views with their metric values.",
+        "Assert unknown session IDs return an empty list or 404 JSON, not an HTML error page."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F119",
+      "category": "backend-api",
+      "description": "POST /api/insoles generates the parametric insole recommendation from analysis + foot size and returns the parameter set.",
+      "steps": [
+        "Submit the insole form while recording network traffic.",
+        "Assert an insole generation request returned 2xx with JSON containing zone parameters (arch height, heel cup depth) and rationale codes.",
+        "Assert the returned parameters match the values displayed in the UI."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F120",
+      "category": "backend-api",
+      "description": "GET /api/insoles/:id/stl?side=left|right streams a binary STL with correct content type and attachment filename.",
+      "steps": [
+        "Trigger the left STL download while recording network traffic.",
+        "Assert the STL request responded 200 with content-type 'model/stl' or 'application/octet-stream'.",
+        "Assert a Content-Disposition attachment filename ending in .stl is present.",
+        "Assert the right-side request returns a different (mirrored) body of similar size."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F121",
+      "category": "backend-api",
+      "description": "API errors return structured JSON (statusCode, message) that the UI renders as friendly toasts, never raw stack traces.",
+      "steps": [
+        "From the page context, fetch an invalid API call (e.g. POST insole with size 999).",
+        "Assert the response is JSON with statusCode and a human-readable message and no stack trace.",
+        "Trigger the same validation through the UI and assert a friendly error toast appears.",
+        "Screenshot the toast."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F122",
+      "category": "database",
+      "description": "Analyses persist durably in MySQL: data saved in one browser session is retrievable in a brand-new browser context using the same session ID.",
+      "steps": [
+        "Complete a capture, then read the session ID from localStorage.",
+        "Open a fresh incognito context, set the same session ID into localStorage, and load the app.",
+        "Assert the previous analysis and wizard progress render in the new context.",
+        "Screenshot the restored data."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F123",
+      "category": "database",
+      "description": "The report shows the capture timestamp for each view, sourced from the stored records.",
+      "steps": [
+        "Complete a FRONT capture and open the report.",
+        "Assert a human-readable date/time is displayed for the FRONT capture.",
+        "Reload and assert the timestamp is identical (stored, not regenerated)."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F124",
+      "category": "database",
+      "description": "Re-capturing a view updates the stored analysis: the report reflects the latest capture, not duplicates.",
+      "steps": [
+        "Complete a FRONT capture, then redo the FRONT view and accept a new capture.",
+        "Open the report and assert exactly one FRONT section is shown with the newest timestamp.",
+        "Fetch the session analyses API and assert only the latest FRONT analysis is returned as current."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F125",
+      "category": "database",
+      "description": "Generated insole records are stored and retrievable: revisiting 'My Insole' after reload shows the previously generated recommendation without regenerating.",
+      "steps": [
+        "Generate an insole, then fully reload the app.",
+        "Navigate to 'My Insole' and assert the same recommendation (same parameters and timestamp) renders from storage.",
+        "Assert no new generation request is fired on load (check network log)."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F126",
+      "category": "disclaimer-legal",
+      "description": "Every analysis/report screen displays the disclaimer 'Not medical advice — consult a healthcare professional'.",
+      "steps": [
+        "Open a per-view report and assert the disclaimer text is visible without scrolling hacks (present on the page).",
+        "Open the combined full report and assert the disclaimer is present there too.",
+        "Screenshot both placements."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F127",
+      "category": "disclaimer-legal",
+      "description": "The insole recommendation and 3D result screens display the same medical disclaimer.",
+      "steps": [
+        "Open the insole form and assert the disclaimer is visible.",
+        "Open the insole result / 3D screen and assert the disclaimer is visible.",
+        "Screenshot both."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F128",
+      "category": "disclaimer-legal",
+      "description": "A dedicated disclaimer/about page explains app limitations (POC, estimation-based, not diagnostic) reachable from the footer.",
+      "steps": [
+        "Click the disclaimer link in the footer.",
+        "Assert a full page describes the POC nature, measurement limitations, and the consult-a-professional guidance.",
+        "Screenshot the page."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F129",
+      "category": "disclaimer-legal",
+      "description": "The disclaimer banner is persistent (not dismissible) on analysis and recommendation screens.",
+      "steps": [
+        "Open the report screen.",
+        "Assert the disclaimer element has no close/dismiss control.",
+        "Reload and assert it is still displayed.",
+        "Repeat on the insole result screen."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F130",
+      "category": "responsive-mobile",
+      "description": "The home page renders a clean single-column layout at phone portrait (390x844) with no horizontal scroll.",
+      "steps": [
+        "Set the viewport to 390x844 and load the home page.",
+        "Assert document.scrollingElement.scrollWidth <= viewport width (no horizontal overflow).",
+        "Assert the hero, journey cards, and CTA stack vertically.",
+        "Screenshot the mobile home page."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F131",
+      "category": "responsive-mobile",
+      "description": "The wizard capture screen fits phone portrait: preview, silhouette, and capture controls all visible without scrolling.",
+      "steps": [
+        "Set viewport to 390x844 and open the FRONT capture step with the fake camera.",
+        "Assert the video preview, capture button, and mode toggles are all within the viewport.",
+        "Screenshot the mobile capture layout."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F132",
+      "category": "responsive-mobile",
+      "description": "Report metric cards stack in a single column on mobile and switch to a multi-column grid on desktop.",
+      "steps": [
+        "Open the full report at 390x844 and assert metric cards are stacked one per row.",
+        "Resize to 1280x800 and assert the cards flow into two or more columns.",
+        "Screenshot both layouts."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F133",
+      "category": "responsive-mobile",
+      "description": "The 3D insole viewer supports touch: one-finger drag rotates and two-finger pinch zooms on a touch viewport.",
+      "steps": [
+        "Open the insole result at a touch-emulated mobile viewport.",
+        "Dispatch a one-finger drag on the canvas and assert the render changes (rotation).",
+        "Dispatch a pinch gesture and assert the model scale changes.",
+        "Screenshot the result."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F134",
+      "category": "responsive-mobile",
+      "description": "On narrow screens the header collapses to a compact bar with a menu button revealing the navigation.",
+      "steps": [
+        "Set viewport to 390x844 and load any page.",
+        "Assert the full nav links are hidden and a menu (hamburger) button is visible.",
+        "Tap the menu button and assert the navigation drawer/sheet opens with all nav items.",
+        "Screenshot the open menu."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F135",
+      "category": "responsive-mobile",
+      "description": "All primary tap targets on mobile are at least 44x44 CSS pixels.",
+      "steps": [
+        "At 390x844, open the wizard and insole screens.",
+        "Evaluate the bounding boxes of primary buttons (capture, accept, download) and assert each is at least 44px in both dimensions.",
+        "Screenshot a representative screen."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F136",
+      "category": "responsive-mobile",
+      "description": "Desktop layouts are constrained to a readable max width and centered rather than stretching full-bleed.",
+      "steps": [
+        "Set viewport to 1920x1080 and open the report page.",
+        "Assert the main content column has a max-width (content width well below 1920) and is horizontally centered.",
+        "Screenshot the desktop layout."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F137",
+      "category": "dark-mode",
+      "description": "The app honors the OS preference: with prefers-color-scheme dark, the UI loads in dark theme automatically.",
+      "steps": [
+        "Emulate prefers-color-scheme: dark and load the home page.",
+        "Assert the page background is dark and text is light (evaluate computed colors).",
+        "Screenshot the dark home page."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F138",
+      "category": "dark-mode",
+      "description": "A theme toggle in the header switches between light and dark instantly across the whole app.",
+      "steps": [
+        "Load the app in light mode.",
+        "Click the theme toggle in the header.",
+        "Assert the background/text colors flip to the dark palette without a reload.",
+        "Navigate to another route and assert dark mode persists.",
+        "Screenshot both themes."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F139",
+      "category": "dark-mode",
+      "description": "The chosen theme persists across reloads via stored preference.",
+      "steps": [
+        "Toggle the app to dark mode.",
+        "Reload the page.",
+        "Assert the app loads directly in dark mode with no light-mode flash content remaining.",
+        "Clear the preference, reload, and assert it falls back to the OS setting."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F140",
+      "category": "dark-mode",
+      "description": "Report severity colors and annotations remain distinguishable and accessible in dark mode.",
+      "steps": [
+        "Open the full report in dark mode.",
+        "Assert severity badges (normal/mild/marked) are visibly distinct against the dark background.",
+        "Assert the annotated capture image overlays remain readable.",
+        "Screenshot the dark-mode report."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F141",
+      "category": "dark-mode",
+      "description": "The 3D viewer scene adapts to dark mode (background and lighting) so the insole stays clearly visible.",
+      "steps": [
+        "Open the insole 3D viewer in light mode and screenshot.",
+        "Switch to dark mode.",
+        "Assert the viewer background darkens while the insole model remains well-lit and visible.",
+        "Screenshot the dark viewer."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F142",
+      "category": "error-states",
+      "description": "Denying camera permission shows a helpful explainer with retry instructions instead of a broken screen.",
+      "steps": [
+        "Launch the browser configured to deny camera permission.",
+        "Open the wizard capture step.",
+        "Assert a friendly message explains permission was denied and how to re-enable it in browser settings, with a 'Try again' button.",
+        "Screenshot the state."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F143",
+      "category": "error-states",
+      "description": "When no pose is detected for several seconds, guidance appears telling the user to adjust framing/lighting.",
+      "steps": [
+        "Open the capture step with a fake-camera video containing no person.",
+        "Wait ~5 seconds.",
+        "Assert an overlay message suggests stepping into frame with the full body visible.",
+        "Assert the capture button is disabled while no pose is detected.",
+        "Screenshot the guidance."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F144",
+      "category": "error-states",
+      "description": "If the backend is unreachable when saving an analysis, a clear error with a Retry action appears and the capture is not lost.",
+      "steps": [
+        "Simulate backend failure (block /api requests via network interception).",
+        "Accept a capture.",
+        "Assert an error toast/panel explains the save failed with a 'Retry' button, and the captured review remains on screen.",
+        "Restore the network, click Retry, and assert the save succeeds.",
+        "Screenshot the error state."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F145",
+      "category": "error-states",
+      "description": "Invalid foot size input is rejected with a specific message and never sent to the backend.",
+      "steps": [
+        "On the insole form enter 0, then letters, then 99.",
+        "Assert each case shows a specific inline validation error and the submit stays disabled.",
+        "Assert no insole generation network request was made (check network log)."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F146",
+      "category": "error-states",
+      "description": "STL generation failure shows an error card with retry, without breaking the rest of the result screen.",
+      "steps": [
+        "Simulate a failing STL endpoint (intercept with a 500 response).",
+        "Click the STL download button.",
+        "Assert an error message appears offering retry, while the 3D viewer and recommendation remain functional.",
+        "Restore the endpoint, retry, and assert the download succeeds.",
+        "Screenshot the failure state."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F147",
+      "category": "error-states",
+      "description": "Browsers without getUserMedia/WebGL support see a graceful capability notice naming supported browsers.",
+      "steps": [
+        "Load the capture step with navigator.mediaDevices removed (evaluate/override before load).",
+        "Assert an unsupported-browser notice renders instead of the camera UI, listing modern supported browsers.",
+        "Screenshot the notice."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F148",
+      "category": "error-states",
+      "description": "Accessing the app over insecure http shows a camera-blocked explanation and directs the user to the HTTPS (ngrok) link.",
+      "steps": [
+        "Open the app over an insecure origin (or simulate isSecureContext=false).",
+        "Navigate to the capture step.",
+        "Assert the message explains cameras require HTTPS and shows/links the secure URL.",
+        "Screenshot the state."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F149",
+      "category": "error-states",
+      "description": "Going offline mid-session shows an offline banner and queues user actions gracefully instead of throwing.",
+      "steps": [
+        "Load the report page, then emulate browser offline mode.",
+        "Trigger an action requiring the network (e.g. accept a capture or regenerate the insole).",
+        "Assert an offline banner or toast appears with no unhandled console exceptions.",
+        "Re-enable the network and assert the banner clears."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F150",
+      "category": "error-states",
+      "description": "If the pose model fails to load (CDN/wasm error), the capture screen shows a retriable model-load failure state.",
+      "steps": [
+        "Intercept the MediaPipe model/wasm request to fail.",
+        "Open the capture step.",
+        "Assert a 'Pose engine failed to load' card renders with a Retry button and troubleshooting hint.",
+        "Restore the request, click Retry, and assert the skeleton overlay becomes functional.",
+        "Screenshot the failure card."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F151",
+      "category": "empty-states",
+      "description": "Before any capture, the wizard entry shows a friendly zero-state explaining the three views with an illustrated 'how it works'.",
+      "steps": [
+        "Open the wizard in a fresh session.",
+        "Assert all three view cards show 'Not captured' and an intro explains the 3-view process.",
+        "Screenshot the zero-state."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F152",
+      "category": "empty-states",
+      "description": "Visiting the report page with no analysis shows an empty state with a CTA to start the posture scan, not a blank page.",
+      "steps": [
+        "In a fresh session navigate directly to the report route.",
+        "Assert an illustrated empty state explains no analysis exists yet with a 'Start scan' button.",
+        "Click the button and assert the wizard opens.",
+        "Screenshot the empty state."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F153",
+      "category": "empty-states",
+      "description": "Visiting the insole area before completing the scan prompts the user to finish their posture analysis first, showing remaining views.",
+      "steps": [
+        "In a session with only FRONT captured, navigate to the insole route.",
+        "Assert a gate message states the scan must be completed and lists SIDE and BACK as remaining, with a 'Continue scan' action.",
+        "Click it and assert the wizard resumes at the next incomplete view.",
+        "Screenshot the gate."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F154",
+      "category": "empty-states",
+      "description": "A partially completed report shows captured views normally and pending views as placeholder cards with capture shortcuts.",
+      "steps": [
+        "Capture only the FRONT view, then open the full report.",
+        "Assert the FRONT section shows real metrics while SIDE and BACK render placeholder cards labeled 'Not captured yet' with capture buttons.",
+        "Click the SIDE placeholder button and assert the SIDE capture flow opens.",
+        "Screenshot the mixed report."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F155",
+      "category": "accessibility",
+      "description": "The entire wizard is operable by keyboard alone: tab to a view card, activate with Enter, trigger capture with the keyboard.",
+      "steps": [
+        "Open the wizard entry and use only Tab/Enter to select the FRONT view.",
+        "Assert focus moves in a logical order and the capture screen opens.",
+        "Tab to the countdown capture button and press Enter; assert the countdown starts.",
+        "Assert Accept/Retake are reachable and operable via keyboard."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F156",
+      "category": "accessibility",
+      "description": "All interactive elements show a clearly visible focus indicator in both themes.",
+      "steps": [
+        "Tab through the home page controls in light mode and assert each focused element shows a visible outline/ring.",
+        "Switch to dark mode and repeat, asserting the ring remains visible against dark surfaces.",
+        "Screenshot a focused control in each theme."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F157",
+      "category": "accessibility",
+      "description": "All meaningful images and captures have alt text; decorative icons are hidden from assistive tech.",
+      "steps": [
+        "Open the report page.",
+        "Assert the capture thumbnails have descriptive alt attributes (e.g. 'Front view capture with posture annotations').",
+        "Assert purely decorative icons have aria-hidden or empty alt.",
+        "Assert the header logo exposes an accessible name."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F158",
+      "category": "accessibility",
+      "description": "Icon-only buttons (theme toggle, mirror, camera switch, reset view) expose aria-labels describing their action.",
+      "steps": [
+        "Open the capture screen and the 3D viewer.",
+        "Assert each icon-only button has a non-empty aria-label matching its function.",
+        "Assert toggles expose state (aria-pressed or equivalent)."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F159",
+      "category": "accessibility",
+      "description": "Body text and UI controls meet WCAG AA contrast in both light and dark themes.",
+      "steps": [
+        "Open the home and report pages in light mode and compute contrast ratios of body text vs background; assert ≥ 4.5:1.",
+        "Repeat in dark mode.",
+        "Assert severity badges keep ≥ 3:1 contrast against their surroundings.",
+        "Screenshot evidence of both themes."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F160",
+      "category": "accessibility",
+      "description": "A skip-to-content link appears on first Tab press and jumps focus past the header to the main content.",
+      "steps": [
+        "Load the home page and press Tab once.",
+        "Assert a 'Skip to content' link becomes visible as the first focusable element.",
+        "Press Enter and assert focus/scroll moves to the main content landmark."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F161",
+      "category": "accessibility",
+      "description": "Dynamic events — countdown ticks, capture taken, analysis saved — are announced via aria-live regions for screen reader users.",
+      "steps": [
+        "Open the capture step and start a countdown capture.",
+        "Assert an aria-live region exists and its text content updates with the countdown and then a 'Capture complete' announcement.",
+        "Accept the capture and assert a save confirmation is announced in the live region."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F162",
+      "category": "observability",
+      "description": "The happy path (home → 3 captures → report → insole → STL) produces zero console errors.",
+      "steps": [
+        "Run the full happy path with the fake camera while collecting console messages.",
+        "Assert no error-level console entries occurred at any step.",
+        "Save the console log summary as evidence."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F163",
+      "category": "observability",
+      "description": "User-facing error toasts include a short error reference ID that also appears in the console/log for correlation.",
+      "steps": [
+        "Trigger a backend save failure (intercept /api).",
+        "Assert the error toast contains a reference code (e.g. 'ERR-XXXX').",
+        "Assert the same code is present in a console log entry.",
+        "Screenshot the toast."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F164",
+      "category": "observability",
+      "description": "An About/status panel shows frontend version, backend version, and pose model status fetched live.",
+      "steps": [
+        "Open the About page.",
+        "Assert frontend version, backend API version (fetched from /api/health or /api/version), and pose model readiness are displayed.",
+        "Assert the backend value matches the API response (compare with a direct fetch).",
+        "Screenshot the panel."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F165",
+      "category": "observability",
+      "description": "A hidden debug panel (e.g. triple-tap the version or ?debug=1) reveals live pose FPS, landmark confidence, and last API latency.",
+      "steps": [
+        "Load the capture step with '?debug=1' and the fake camera.",
+        "Assert a debug overlay shows FPS, average landmark confidence, and last API round-trip time, all updating.",
+        "Remove the flag and assert the overlay is hidden by default.",
+        "Screenshot the debug overlay."
+      ],
+      "passes": false
+    }
+  ]
+}
