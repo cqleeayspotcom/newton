@@ -466,3 +466,22 @@ the skeleton overlay is visibly stable (jitter removed) vs raw detections; then
 F198 confidence weighting, F199 persistence/hysteresis gating, etc. The metrics
 loop (L4) added here is the hook those findings-level features build on. Agent/
 chatbot LLM features remain gated on AKASHML_API_KEY per demo-priority status.
+
+-------------------------------------------------------------------------------
+DIRECTION UPDATE — HACKATHON DELIVERY PRIORITY  ·  2026-07-17  ·  (planning)
+-------------------------------------------------------------------------------
+Operator delivered a working MVP slice directly (posture findings + insole reco +
+hero; PR #14). Landing hosted on Zero (https://sites.withzero.ai/newfoot); Akash
+deployed via console-axi (funded wallet, live deployment). Deck regenerated
+(docs/presentation.md).
+
+*** BUILD-ORDER OVERRIDE (see docs/demo-priority.md ⭐ HACKATHON DELIVERY) ***
+NEXT, in this order, CLIENT-SIDE (extend analysis/ capture/ insole/):
+ 1. Reference-posture GHOST overlay — F071 (ideal level skeleton drawn next to the
+    detected one), F074 (highlight deviating segments), F073 (toggle).
+ 2. Interactive 3D insole (Three.js) — F090/F091/F092. `docker compose exec frontend
+    npm install three @types/three` first.
+ 3. STL export — F098 (binary STL via three STLExporter, validate with
+    tools/stl_check.js), F099 (mirrored right).
+THEN resume daemon polish F197–F210.
+Verify each in-browser with tools/test_media/person.y4m + screenshot.

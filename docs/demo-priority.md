@@ -22,6 +22,36 @@ Rules:
 
 ---
 
+## ⭐ HACKATHON DELIVERY — BUILD THESE FIRST (operator request 2026-07-17)
+These complete the demo. Build in THIS order, BEFORE resuming the daemon polish
+(F197–F210) or anything else. Keep everything CLIENT-SIDE (extend the MVP slice —
+`analysis/`, `capture/`, `insole/` — no backend/DB needed). Verify each in the
+browser with the real-person fake camera (`tools/test_media/person.y4m`) + a screenshot.
+
+1. **Reference-posture ghost overlay (skeleton: normal vs real).**
+   - **F071** — draw a SECOND, dimmed "ideal" skeleton on the capture overlay next to
+     the detected one: anchored to the user's shoulder/hip midline, but with LEVEL
+     shoulders + level hips + vertical spine/head. Extend `capture.ts` `drawSkeleton`.
+   - **F074** — highlight the body segments that deviate past threshold (warning color).
+   - **F073** — a toggle to show/hide the reference ghost.
+
+2. **Interactive 3D insole (Three.js).** EXTEND the existing `/insole` component.
+   - Add Three.js: `docker compose exec frontend npm install three @types/three`
+     (and add to frontend/package.json).
+   - **F090** — build a parametric insole mesh from the recommended spec
+     (length/width/arch height/heel wedge/heel cup) and render it in a Three.js viewer.
+   - **F091** rotate (OrbitControls) · **F092** zoom. Client-side only.
+
+3. **STL export for 3D printing.**
+   - **F098** — export the generated insole mesh to a valid, watertight BINARY STL
+     (Three.js `STLExporter`) with a download button. VALIDATE with
+     `node tools/stl_check.js <file>` (must pass watertight + dims).
+   - **F099** — the mirrored right-foot STL.
+
+After these, resume Phase 1 daemon polish (F197–F210) then the rest.
+
+---
+
 ## Phase 0 — Foundation (mostly done; verify + smoke)
 - **F002** ✅ · **F004** ✅ · **F005** HTTPS/secure-context via ngrok (camera)
 
