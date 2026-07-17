@@ -536,3 +536,19 @@ past threshold in a warning color (compare detected vs the ghost's ideal), then
 F073 (toggle to show/hide the ghost). Then the interactive 3D insole (F090/F091/
 F092, add three + @types/three) and STL export (F098/F099). Agent/chatbot LLM
 features remain BLOCKED until AKASHML_API_KEY is set.
+
+## F074 — deviated-segment highlight on the detected skeleton (reference-comparison)
+Segments whose front-view metric deviates past threshold are now drawn in a warning
+red (#ff3b30, thicker + glow) on the DETECTED skeleton, while in-tolerance bones stay
+neutral blue — directly showing the gap from the emerald ideal ghost (F071). Mapping:
+shoulder_tilt→shoulder line [11,12], pelvic_tilt→hip line [23,24], head_lean→head/face
+bones (idx 0–10). Deviations computed from the same landmarks being drawn, exposed via
+`data-deviated-segments`/`data-deviated-count` + a "N segment(s) highlighted" badge.
+- Files: capture.ts (drawSkeleton per-connection colour + isDeviatedConnection helper +
+  deviatedSegments signal), capture.html (badge + stage data attrs), styles.scss (nf-badge--warn).
+- Verified: real-person fake camera (tools/test_media/person.y4m). Screenshot shows the
+  shoulder line, hip line, and head bones red (3 findings: shoulder 4.5° mild, pelvic 9°
+  moderate, head 32.9° marked) with limbs blue + ghost underneath.
+  logs/screens/f074-deviation-highlight.png.
+- Smoke: smoke/tests/f074-deviation-highlight.spec.ts asserts findings present,
+  data-deviated-count ≥1, warning-red + blue pixels on the overlay. Full suite 14/14 green.
