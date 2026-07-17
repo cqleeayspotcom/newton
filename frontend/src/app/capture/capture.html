@@ -1,0 +1,45 @@
+<section class="nf-capture" data-testid="capture-front">
+  <h2 class="nf-capture__title">Front view</h2>
+  <p class="nf-capture__hint">
+    Stand back so your whole body is in frame, facing the camera straight on.
+  </p>
+
+  <div class="nf-capture__stage" [attr.data-state]="state()">
+    <video
+      #video
+      class="nf-capture__video"
+      data-testid="capture-video"
+      autoplay
+      playsinline
+      muted
+    ></video>
+
+    @if (state() !== 'live') {
+      <div class="nf-capture__overlay" data-testid="capture-overlay">
+        @switch (state()) {
+          @case ('requesting') {
+            <p>Requesting camera access…</p>
+          }
+          @case ('denied') {
+            <p>Camera permission denied. Allow camera access to continue.</p>
+          }
+          @default {
+            <p>{{ errorMessage() }}</p>
+          }
+        }
+      </div>
+    }
+  </div>
+
+  <p class="nf-capture__status">
+    Preview:
+    <span class="nf-badge" [class.nf-badge--ok]="state() === 'live'" data-testid="capture-status">
+      {{ state() === 'live' ? 'live' : state() }}
+    </span>
+  </p>
+
+  <p class="nf-capture__disclaimer" data-testid="capture-disclaimer">
+    Wellness &amp; visualization POC — not medical advice. Consult a healthcare
+    professional.
+  </p>
+</section>
