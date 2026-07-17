@@ -8,8 +8,17 @@ import {
   viewChild,
 } from '@angular/core';
 
+import { Router } from '@angular/router';
+
 import { PoseEngine } from '../pose/pose-engine';
 import { RateMeter } from '../pose/rate-meter';
+import { AnalysisStore } from '../analysis/analysis-store';
+import {
+  computeMetrics,
+  deriveFindings,
+  type Finding,
+  type PostureMetrics,
+} from '../analysis/posture-metrics';
 
 /** A `<video>` that may expose the (non-standard) rVFC capture hook. */
 type RvfcVideo = HTMLVideoElement & {
@@ -37,9 +46,16 @@ export class Capture implements OnDestroy {
     viewChild.required<ElementRef<HTMLCanvasElement>>('overlay');
 
   private readonly poseEngine = inject(PoseEngine);
+  private readonly router = inject(Router);
+  private readonly store = inject(AnalysisStore);
 
   protected readonly state = signal<CaptureState>('requesting');
   protected readonly errorMessage = signal('');
+
+  /** Live posture findings derived from the latest landmarks (metrics loop). */
+  protected readonly liveFindings = signal<Finding[]>([]);
+  protected readonly hasPerson = signal(false);
+  private lastMetrics: PostureMetrics | null = null;
 
   /** F034 — MediaPipe model-loading lifecycle, surfaced to the template. */
   protected readonly poseState = this.poseEngine.state;
@@ -194,6 +210,14 @@ export class Capture implements OnDestroy {
       this.renderHz.set(round1(this.renderMeter.hzAt(now)));
       this.inferenceHz.set(round1(this.poseEngine.inferenceRate(now)));
       this.metricsHz.set(round1(this.metricsMeter.hzAt(now)));
+
+      // Posture analysis: compute front-view metrics + findings from the latest
+      // landmarks. Cheap, so it rides the ~10Hz metrics loop.
+      const m = computeMetrics(this.poseEngine.landmarks());
+      this.lastMetrics = m;
+      this.liveFindings.set(deriveFindings(m));
+      this.hasPerson.set(this.poseEngine.landmarkCount() > 0);
+
       this.metricsTimer = setTimeout(metrics, METRICS_INTERVAL_MS);
     };
     metrics();
@@ -243,6 +267,18 @@ export class Capture implements OnDestroy {
       ctx.arc(px(lm.x, canvas.width), px(lm.y, canvas.height), r, 0, Math.PI * 2);
       ctx.fill();
     }
+  }
+
+  /** Snapshot the current analysis and move to the insole recommendation. */
+  protected analyze(): void {
+    this.store.capture(
+      this.lastMetrics ?? {
+        shoulderTiltDeg: null,
+        hipTiltDeg: null,
+        headLeanDeg: null,
+      },
+    );
+    void this.router.navigate(['/insole']);
   }
 
   ngOnDestroy(): void {

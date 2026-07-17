@@ -1,0 +1,50 @@
+<section class="nf-insole" data-testid="insole">
+  <a routerLink="/scan/front" class="nf-insole__back">← Back to scan</a>
+  <h2 class="nf-insole__title">Your corrective insole</h2>
+
+  @if (!hasAnalysis()) {
+    <p class="nf-insole__empty" data-testid="insole-empty">
+      No analysis yet — <a routerLink="/scan/front">run a posture scan first</a>.
+    </p>
+  } @else {
+    <div class="nf-insole__form">
+      <label for="footSize">Foot size (EU)</label>
+      <input
+        id="footSize"
+        type="number"
+        min="35"
+        max="48"
+        [value]="footSizeEu()"
+        (input)="onSize($any($event.target).value)"
+        data-testid="foot-size"
+      />
+    </div>
+
+    <div class="nf-card" data-testid="insole-spec">
+      <div class="nf-card__row"><span>Size</span><b>EU {{ spec().footSizeEu }} · {{ spec().lengthMm }}×{{ spec().widthMm }} mm</b></div>
+      <div class="nf-card__row"><span>Arch support</span><b>{{ spec().archHeightMm }} mm</b></div>
+      <div class="nf-card__row"><span>Heel posting</span><b>{{ spec().heelWedgeDeg }}° {{ spec().heelWedgeSide }}</b></div>
+      <div class="nf-card__row"><span>Heel cup</span><b>{{ spec().heelCupDepthMm }} mm</b></div>
+      <div class="nf-card__row"><span>Stiffness</span><b>{{ spec().stiffness }}</b></div>
+      <hr />
+      <div class="nf-card__row"><span>Material</span><b>{{ spec().material }}</b></div>
+      <div class="nf-card__row"><span>Infill</span><b>{{ spec().infillPct }}% gyroid</b></div>
+      <div class="nf-card__row"><span>Layer height</span><b>{{ spec().layerHeightMm }} mm</b></div>
+      <div class="nf-card__row"><span>Orientation</span><b>{{ spec().printOrientation }}</b></div>
+    </div>
+
+    <div class="nf-insole__why" data-testid="insole-rationale">
+      <h3>Why this insole</h3>
+      <ul>
+        @for (r of spec().rationale; track r) {
+          <li>{{ r }}</li>
+        }
+      </ul>
+    </div>
+  }
+
+  <p class="nf-insole__disclaimer">
+    Wellness &amp; visualization POC — not medical advice. Recommendations are
+    heuristic and illustrative. Consult a healthcare professional.
+  </p>
+</section>

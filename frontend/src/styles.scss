@@ -68,3 +68,104 @@ code {
   padding: 0.05rem 0.3rem;
   border-radius: 5px;
 }
+
+/* Shared primary button (global so scoped components pick it up). */
+.nf-cta {
+  display: inline-block;
+  padding: 0.7rem 1.25rem;
+  border: none;
+  border-radius: 10px;
+  background: var(--nf-accent);
+  color: #fff;
+  font-weight: 600;
+  font-size: 1rem;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover {
+    filter: brightness(1.06);
+  }
+}
+
+/* Live posture findings (used in the capture screen). */
+.nf-findings {
+  max-width: 520px;
+  margin: 1.5rem auto 0;
+  text-align: left;
+}
+.nf-findings__title {
+  font-size: 1rem;
+  margin: 0 0 0.6rem;
+}
+.nf-findings__empty,
+.nf-findings__ok {
+  color: var(--nf-fg-muted);
+  font-size: 0.9rem;
+}
+.nf-findings__ok {
+  color: var(--nf-ok);
+}
+.nf-findings__list {
+  list-style: none;
+  margin: 0 0 1rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.nf-finding {
+  border: 1px solid var(--nf-border);
+  border-left: 3px solid var(--nf-fg-muted);
+  border-radius: 10px;
+  background: var(--nf-surface);
+  padding: 0.6rem 0.8rem;
+
+  &[data-severity='mild'] {
+    border-left-color: #d9a441;
+  }
+  &[data-severity='moderate'] {
+    border-left-color: #e07a3e;
+  }
+  &[data-severity='marked'] {
+    border-left-color: var(--nf-danger);
+  }
+}
+.nf-finding__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+.nf-finding__value {
+  color: var(--nf-fg-muted);
+  font-weight: 500;
+  text-transform: capitalize;
+}
+.nf-finding__explain {
+  margin: 0.3rem 0 0;
+  font-size: 0.83rem;
+  color: var(--nf-fg-muted);
+}
+.nf-findings__cta {
+  margin-top: 0.5rem;
+}
+
+/* Home hero extras */
+.nf-privacy {
+  margin: 1rem 0 0;
+  font-size: 0.82rem;
+  color: var(--nf-fg-muted);
+}
+.nf-how {
+  display: flex;
+  gap: 1.25rem;
+  justify-content: center;
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--nf-fg-muted);
+
+  b {
+    color: var(--nf-accent);
+  }
+}
