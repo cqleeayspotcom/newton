@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { AnalysisStore } from '../analysis/analysis-store';
 import { recommendInsole } from './insole-rules';
 import { InsoleViewer } from './insole-viewer';
+import { downloadInsoleStl } from './insole-stl';
 
 /**
  * Insole recommendation screen (POC demo slice). Reads the posture findings from
@@ -32,5 +33,10 @@ export class Insole {
   protected onSize(value: string): void {
     const n = Number(value);
     if (!Number.isNaN(n)) this.footSizeEu.set(Math.max(35, Math.min(48, n)));
+  }
+
+  /** Download a print-ready binary STL of the recommended insole (F098). */
+  protected downloadStl(side: 'left' | 'right'): void {
+    downloadInsoleStl(this.spec(), side);
   }
 }
