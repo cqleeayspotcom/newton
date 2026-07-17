@@ -81,3 +81,11 @@ Loops are decoupled via ring buffers / message passing, each at its own rate.
 - Landmark-angle math is unit-tested against `tools/pose_fixtures/`; the synthetic
   fake-camera clips verify UI/daemon behavior but not real detection (drop a real
   human y4m to exercise the full pipeline).
+- **Cross-origin isolation is REQUIRED.** MediaPipe's threaded WASM uses
+  `SharedArrayBuffer`, which needs `Cross-Origin-Opener-Policy: same-origin` +
+  `Cross-Origin-Embedder-Policy: require-corp`. Chromium exposes SAB on desktop even
+  without it (so a Chromium-only test hides the bug), but **Safari/Firefox fail to
+  load the pose engine without these headers.** They are set on the dev-server via
+  `angular.json` (`serve.options.headers`); **any nginx/Akash prod serving must set
+  them too.** Guarded by `smoke/tests/cross-origin-isolation.spec.ts` (asserts
+  `crossOriginIsolated === true`). All app assets are same-origin, so COEP is safe.
