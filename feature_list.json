@@ -2288,7 +2288,7 @@
         "Assert the overlay render rate stays high even when the inference rate is lower.",
         "Screenshot the perf panel."
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "F197",

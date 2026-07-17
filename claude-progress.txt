@@ -413,3 +413,56 @@ worker plumbing added here. Then F197 One-Euro smoothing, F198 confidence
 weighting, etc. Agent/chatbot LLM features remain BLOCKED until AKASHML_API_KEY
 is set. NOTE: person.y4m remains the go-to clip for real landmark detection; the
 pose worker is now the inference path all daemon loops build on.
+
+-------------------------------------------------------------------------------
+SESSION 009 — F196 (perception-daemon)  ·  2026-07-17  ·  model: claude-opus-4-8
+-------------------------------------------------------------------------------
+FEATURE: F196 — the perception pipeline runs as DECOUPLED MULTI-RATE LOOPS
+(capture → inference → smoothing/metrics → render), each at its own independent
+rate, so slow inference never blocks rendering. Second of the F195-F203 daemon
+loops, built directly on F195's Web-Worker inference path.
+
+WORK:
+- frontend/src/app/pose/rate-meter.ts (NEW): a ~30-line sliding-window RateMeter.
+  Counts tick()s inside a trailing 1s window and reports Hz; old ticks age out so
+  a stalled loop decays toward 0 (a slow loop genuinely reads lower than a fast
+  one — no stale peak). Dependency-free (Karpathy ethos).
+- frontend/src/app/pose/pose-engine.ts: the engine now ticks an inferenceMeter on
+  every worker 'result' message and exposes inferenceRate(now) — the true (lower)
+  inference throughput, sampled by the metrics loop.
+- frontend/src/app/capture/capture.ts: split the single rAF loop into THREE
+  decoupled loops running at their own rates:
+    • L1 Capture — driven by requestVideoFrameCallback (per decoded camera frame,
+      ~15-30Hz; ~30Hz setTimeout fallback). Hands frames to the worker; the engine
+      drops frames while one is in flight so the worker's lower rate never stalls
+      capture.
+    • L5 Render — a requestAnimationFrame loop (~display rate) that ONLY draws the
+      latest worker skeleton. Never awaits inference → stays high (~120Hz headless).
+    • L4 Metrics — a ~10Hz self-timed setTimeout loop, decoupled from render, that
+      samples every loop's RateMeter and publishes captureHz/inferenceHz/metricsHz/
+      renderHz signals (future F199/F200 findings hang off this same loop).
+  ngOnDestroy tears down rAF + both timers.
+- capture.html: a live perf panel (data-testid perf-panel) with per-loop readouts
+  (Capture/Inference/Metrics/Render Hz) + data-*-hz attributes for assertion.
+- capture.scss: perf-panel styling on the --nf-* design tokens.
+
+VERIFIED (browser, as a human — Playwright, real-person fake camera person.y4m):
+- / -> Start scan -> /scan/front; preview live; pose engine ready; 33 landmarks
+  tracked; skeleton drawn over the warrior-pose subject.
+- Perf panel reads SEPARATE, live per-loop rates and proves decoupling:
+  Capture 14.9Hz · Inference 8.5Hz · Metrics 9.9Hz · Render 120Hz. Render (120Hz)
+  stays far above Inference (8.5Hz) — slow inference does NOT throttle rendering;
+  Metrics holds ~10Hz independent of the faster loops. 0 console errors.
+  Disclaimer visible.
+- Screenshot logs/screens/f196-perf-panel.png (skeleton + perf panel).
+- New smoke test smoke/tests/f196-multirate-pipeline.spec.ts asserts all four loop
+  rates > 0, metrics ~<=15Hz, and render > inference (and render >= 20Hz). Full app
+  suite GREEN (11/11).
+
+FEATURE LIST: F196 -> passes:true (9/210 passing).
+
+NEXT (demo-priority Phase 1): F197 — One-Euro temporal smoothing per landmark so
+the skeleton overlay is visibly stable (jitter removed) vs raw detections; then
+F198 confidence weighting, F199 persistence/hysteresis gating, etc. The metrics
+loop (L4) added here is the hook those findings-level features build on. Agent/
+chatbot LLM features remain gated on AKASHML_API_KEY per demo-priority status.

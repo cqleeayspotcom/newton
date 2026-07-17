@@ -99,6 +99,36 @@
     </span>
   </p>
 
+  <!-- F196 — live perf panel: each perception loop runs at its own rate. -->
+  <div
+    class="nf-perf"
+    data-testid="perf-panel"
+    [attr.data-capture-hz]="captureHz()"
+    [attr.data-inference-hz]="inferenceHz()"
+    [attr.data-metrics-hz]="metricsHz()"
+    [attr.data-render-hz]="renderHz()"
+  >
+    <span class="nf-perf__title">Pipeline (multi-rate loops)</span>
+    <div class="nf-perf__loops">
+      <span class="nf-perf__loop" data-testid="perf-capture">
+        <span class="nf-perf__label">Capture</span>
+        <span class="nf-perf__hz" [attr.data-hz]="captureHz()">{{ captureHz() }} Hz</span>
+      </span>
+      <span class="nf-perf__loop" data-testid="perf-inference">
+        <span class="nf-perf__label">Inference</span>
+        <span class="nf-perf__hz" [attr.data-hz]="inferenceHz()">{{ inferenceHz() }} Hz</span>
+      </span>
+      <span class="nf-perf__loop" data-testid="perf-metrics">
+        <span class="nf-perf__label">Metrics</span>
+        <span class="nf-perf__hz" [attr.data-hz]="metricsHz()">{{ metricsHz() }} Hz</span>
+      </span>
+      <span class="nf-perf__loop" data-testid="perf-render">
+        <span class="nf-perf__label">Render</span>
+        <span class="nf-perf__hz" [attr.data-hz]="renderHz()">{{ renderHz() }} Hz</span>
+      </span>
+    </div>
+  </div>
+
   <p class="nf-capture__disclaimer" data-testid="capture-disclaimer">
     Wellness &amp; visualization POC — not medical advice. Consult a healthcare
     professional.
