@@ -68,6 +68,55 @@
   color: var(--nf-fg-muted);
 }
 
+/* F073 — reference-ghost show/hide toggle (an accessible switch). */
+.nf-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-left: 0.5rem;
+  padding: 0.15rem 0.5rem 0.15rem 0.2rem;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--nf-fg-muted);
+  background: transparent;
+  border: 1px solid var(--nf-border);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.nf-toggle__track {
+  display: inline-flex;
+  align-items: center;
+  width: 34px;
+  height: 18px;
+  padding: 2px;
+  border-radius: 999px;
+  background: rgba(120, 120, 120, 0.4);
+  transition: background 0.15s ease;
+}
+
+.nf-toggle__thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.15s ease;
+}
+
+.nf-toggle--on {
+  color: #10b981;
+  border-color: rgba(16, 185, 129, 0.5);
+}
+
+.nf-toggle--on .nf-toggle__track {
+  background: rgba(16, 185, 129, 0.85);
+}
+
+.nf-toggle--on .nf-toggle__thumb {
+  transform: translateX(16px);
+}
+
 /* F196 — live multi-rate pipeline perf panel. */
 .nf-perf {
   display: flex;

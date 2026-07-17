@@ -70,6 +70,18 @@ export class Capture implements OnDestroy {
   protected readonly ghostSegmentCount = signal(0);
 
   /**
+   * F073 — user toggle for the reference ghost. When off, the ideal ghost is
+   * not drawn (and `ghostActive` reports false) while the detected skeleton +
+   * deviation highlights keep rendering. Defaults on so the comparison shows.
+   */
+  protected readonly ghostEnabled = signal(true);
+
+  /** F073 — flip the reference-ghost overlay on/off. */
+  protected toggleGhost(): void {
+    this.ghostEnabled.update((on) => !on);
+  }
+
+  /**
    * F074 — the metric keys whose skeleton segment is currently drawn in the
    * warning colour because the metric deviates past threshold (e.g.
    * `shoulder_tilt`). Exposed as a debug/verification hook so the highlighted
@@ -271,8 +283,14 @@ export class Capture implements OnDestroy {
     }
 
     // F071 — draw the dimmed ideal-posture ghost UNDER the detected skeleton so
-    // the real (solid) skeleton reads on top of it.
-    this.drawGhost(ctx, canvas, buildReferenceGhost(landmarks));
+    // the real (solid) skeleton reads on top of it. F073 — only when the user
+    // has the reference ghost toggled on.
+    if (this.ghostEnabled()) {
+      this.drawGhost(ctx, canvas, buildReferenceGhost(landmarks));
+    } else {
+      this.ghostActive.set(false);
+      this.ghostSegmentCount.set(0);
+    }
 
     // F074 — which body segments deviate past threshold, from the SAME
     // landmarks we are about to draw (so the highlight matches the skeleton).
