@@ -3,30 +3,34 @@
 #
 # Each session: runs `claude -p` with the coding-agent prompt, one feature per
 # session, logging every model turn/tool-call to logs/session-NN.jsonl and a
-# summary to logs/session-NN.json. After each session it ENFORCES the contract:
-# fails loudly if the repo is left dirty, and reports features-passing count and
-# cost per session (§5.5, §5.8).
+# summary to logs/session-NN.json. Work happens on a feat/ branch and lands via
+# a PR (tools/land.sh). After each session it ENFORCES the contract: fails loudly
+# if the session doesn't end on a clean main, and reports passing-count + cost.
 #
 # Usage:
-#   ./run_loop.sh [num_sessions]        # default 1
+#   ./run_loop.sh [N]        # run N sessions (default 1)
+#   ./run_loop.sh all        # run UNTIL all features pass (or the loop stalls)
 # Env:
 #   NEWFOOT_MODEL   model id (default claude-opus-4-8; override e.g. claude-sonnet-5)
 #   MAX_TURNS       per-session turn cap (default 200)
+#   STALL_LIMIT     'all' mode: stop after this many no-progress sessions (default 4)
+#   MAX_SESSIONS    'all' mode: hard safety cap on total sessions (default 300)
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$ROOT"
 
-SESSIONS="${1:-1}"
+ARG="${1:-1}"
 MAX_TURNS="${MAX_TURNS:-200}"
 MODEL="${NEWFOOT_MODEL:-claude-opus-4-8}"
+STALL_LIMIT="${STALL_LIMIT:-4}"
+MAX_SESSIONS="${MAX_SESSIONS:-300}"
 
 command -v claude >/dev/null 2>&1 || { echo "error: claude CLI not found." >&2; exit 1; }
 mkdir -p logs
 
-count_passing() {
-  node -e 'const d=require("./feature_list.json");console.log(d.features.filter(f=>f.passes).length+"/"+d.features.length)'
-}
+pass_num()  { node -e 'const d=require("./feature_list.json");console.log(d.features.filter(f=>f.passes).length)'; }
+total_num() { node -e 'const d=require("./feature_list.json");console.log(d.features.length)'; }
 
 next_num() {
   local n=1
@@ -36,7 +40,9 @@ next_num() {
 
 BOOTSTRAP='Read prompts/coding_agent.md and CLAUDE.md in full, then complete EXACTLY ONE failing feature following the startup routine. Run ./init.sh, run the smoke suite, and pick the next passes:false feature from docs/demo-priority.md (demo-first order, NOT ascending id). Create a feat/<Fxxx>-<slug> branch off main (never commit to main). Implement it, verify end-to-end through the browser (screenshot to logs/screens/), add a smoke test, flip passes:true only after real verification, append an entry to claude-progress.txt, commit on the branch, then run tools/land.sh to open a PR and squash auto-merge into main. End on a clean main.'
 
-for ((s=1; s<=SESSIONS; s++)); do
+# Run one coding session. Exits the whole script (2) on a contract violation.
+run_session() {
+  local NN LOG SUMMARY before after code
   NN="$(next_num)"
   LOG="logs/session-${NN}.jsonl"
   SUMMARY="logs/session-${NN}.json"
@@ -45,7 +51,7 @@ for ((s=1; s<=SESSIONS; s++)); do
   git checkout main --quiet 2>/dev/null || true
   git pull --ff-only origin main --quiet 2>/dev/null || true
 
-  before="$(count_passing)"
+  before="$(pass_num)/$(total_num)"
   echo "==================================================================="
   echo "▸ Session ${NN} | model=${MODEL} | max-turns=${MAX_TURNS} | passing ${before}"
   echo "==================================================================="
@@ -58,7 +64,6 @@ for ((s=1; s<=SESSIONS; s++)); do
     | tee "$LOG"
   code="${PIPESTATUS[1]}"
 
-  # Summarize from the final stream-json "result" event.
   node -e '
     const fs=require("fs");
     const lines=fs.readFileSync(process.argv[1],"utf8").trim().split("\n");
@@ -76,10 +81,11 @@ for ((s=1; s<=SESSIONS; s++)); do
     console.log("  cost=$"+(out.total_cost_usd??"?")+" turns="+(out.num_turns??"?")+" error="+(out.is_error??"?"));
   ' "$LOG" "$NN" "$SUMMARY" || echo "  (could not summarize session ${NN})"
 
-  after="$(count_passing)"
+  after="$(pass_num)/$(total_num)"
   echo "▸ Session ${NN} done | passing ${before} -> ${after} | exit ${code}"
 
   # Contract: session must land its branch and return to a clean main.
+  local CUR_BRANCH
   CUR_BRANCH="$(git branch --show-current)"
   if [ "$CUR_BRANCH" != "main" ]; then
     echo "✗ CONTRACT VIOLATION: session left branch '${CUR_BRANCH}' checked out (expected main)." >&2
@@ -92,6 +98,52 @@ for ((s=1; s<=SESSIONS; s++)); do
     echo "  Stopping loop. Inspect and clean before continuing." >&2
     exit 2
   fi
+}
+
+# --- mode detection --------------------------------------------------------
+MODE="count"; SESSIONS=1
+if [ "$ARG" = "all" ] || [ "$ARG" = "until-done" ]; then
+  MODE="until-done"
+else
+  case "$ARG" in
+    ''|*[!0-9]*) echo "usage: ./run_loop.sh [N|all]" >&2; exit 2 ;;
+    *) SESSIONS="$ARG" ;;
+  esac
+fi
+
+# --- driver ----------------------------------------------------------------
+s=0; stall=0
+while :; do
+  s=$((s+1))
+
+  if [ "$MODE" = "count" ]; then
+    [ "$s" -gt "$SESSIONS" ] && break
+  else
+    if [ "$s" -gt "$MAX_SESSIONS" ]; then
+      echo "▸ Reached MAX_SESSIONS=${MAX_SESSIONS}; stopping."; break
+    fi
+    if [ "$(pass_num)" -ge "$(total_num)" ]; then
+      echo "▸ All $(total_num) features passing — solution complete. 🎉"; break
+    fi
+  fi
+
+  before_n="$(pass_num)"
+  run_session
+  after_n="$(pass_num)"
+
+  if [ "$MODE" = "until-done" ]; then
+    if [ "$after_n" -le "$before_n" ]; then
+      stall=$((stall+1))
+      echo "▸ No new passing feature (${stall}/${STALL_LIMIT} no-progress sessions)."
+      if [ "$stall" -ge "$STALL_LIMIT" ]; then
+        echo "✗ Stopping: ${STALL_LIMIT} consecutive sessions with no progress." >&2
+        echo "  Likely blocked (e.g. missing sponsor keys in .env) or a hard bug. Inspect logs/." >&2
+        break
+      fi
+    else
+      stall=0
+    fi
+  fi
 done
 
-echo "▸ Loop complete. Final: $(count_passing) features passing."
+echo "▸ Loop finished. Final: $(pass_num)/$(total_num) features passing."
