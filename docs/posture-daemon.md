@@ -50,7 +50,7 @@ Loops are decoupled via ring buffers / message passing, each at its own rate.
 | L4 Analysis | ~5–10Hz | F199, F200 | angles, persistence gate, temporal model |
 | L5 Feedback | ~30Hz | F201 | overlay, coaching, quality meter |
 | L6 Calibration | ~0.1Hz | F202 | tilt/scale/baseline normalization |
-| L7 Self-improve | offline | F203 | privacy-preserving tuning via run_loop |
+| L7 Self-improve | offline | F203, **F206–F210** | autonomous self-supervised tuning — see `docs/self-improve-loop.md` |
 
 ## Why this analyzes better
 1. **Temporal fusion / denoising (L3):** jitter is filtered out → stable, trustworthy

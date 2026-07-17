@@ -33,10 +33,14 @@ This file is high-signal context only — it points to where things live.
 - `docs/` — `research.md` (pose SOTA + metric thresholds), `insole-rules.md` (rule
   table posture+size → insole params), `decisions.md` (ADRs — read before changing
   architecture).
-- `feature_list.json` — the roadmap (203 features; F001–F165 core app, F166–F194
-  agent + sponsors + landing, F195–F203 posture perception daemon). Build order is
-  `docs/demo-priority.md` (posture daemon is the TOP priority).
-- `docs/posture-daemon.md` — the real-time posture analysis loop/daemon architecture.
+- `feature_list.json` — the roadmap (210 features; F001–F165 core app, F166–F194
+  agent + sponsors + landing, F195–F203 posture daemon, F204–F205 Pomerium,
+  F206–F210 autonomous self-improvement). Build order is `docs/demo-priority.md`
+  (posture daemon is the TOP priority).
+- `docs/posture-daemon.md` — real-time posture analysis loop/daemon architecture.
+- `docs/self-improve-loop.md` — the autonomous (no-human) model self-improvement loop.
+- `docs/pomerium.md` — Pomerium (secure front door) integration.
+- `docs/presentation.md` — slide-by-slide pitch deck for the whole solution.
 - `docs/market-landing.md` — market analysis behind the landing-page features.
 - `tools/` — `db.sh`, `stl_check.js`, `expose.sh`, `pose_fixtures/`, `test_media/`.
 - `smoke/` — Playwright regression suite (one test per passing feature).

@@ -207,3 +207,22 @@ without a paid/blocking key:
 Only `AKASHML_API_KEY` (the LLM brain for the agent/chatbot) remains a blocking key.
 The ≥3-sponsor Tool-Use requirement is satisfied by Akash + Zero + Pomerium even
 before the LLM brain is wired.
+
+## ADR-0015 — Autonomous self-improvement loop (self-supervised, test-gated)
+**Date:** 2026-07-17 · **Status:** accepted
+**Context:** The posture model/thresholds must improve over time **with no human
+intervention and no labeled data**. Naive "self-improvement" needs ground-truth
+labels we don't have.
+**Decision:** Build the L7 self-improvement loop (F206–F210, `docs/self-improve-loop.md`)
+as a **scheduled backend daemon** that optimizes runtime parameters (ideal angle
+thresholds, One-Euro beta/mincutoff, persistence window, hysteresis; optional
+temporal/LSTM retrain) against **self-supervised objectives** — temporal stability,
+cross-view agreement, mirror/scale invariance, confidence-weighted consistency —
+with **`tools/pose_fixtures/` as a non-overridable non-regression guardrail**.
+Candidates are validated by replay + fixtures; the best non-regressing one is
+**auto-applied** with an audit record and **auto-rollback** on later regression.
+Safety rails: parameter clamps, a kill-switch, and the fixtures floor.
+**Consequences:** Full autonomy is safe because the deterministic fixtures can never
+be broken by a tuning change; no human labels or approvals are needed. Distinct from
+`run_loop.sh` (which autonomously improves *code*): L7 improves the *model/params* at
+runtime. Derived metrics only — video never leaves the device.
