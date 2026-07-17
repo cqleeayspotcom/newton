@@ -55,6 +55,8 @@ This file is high-signal context only — it points to where things live.
 - `cd frontend && npm run test` — frontend unit tests.
 - `docker compose logs -f <service>` — tail logs. `POST /api/client-logs` — browser → backend logs.
 - `./run_loop.sh [n]` — run n headless coding sessions (`NEWFOOT_MODEL`, `MAX_TURNS` env).
+- `tools/land.sh` — land the current `feat/` branch: push → PR → squash auto-merge →
+  back to a clean `main` (`LAND_MERGE_MODE=admin|auto`).
 
 ## Browser verification & fake camera
 - Verify features **through the browser** (Playwright MCP in `.mcp.json`, or add a
@@ -99,6 +101,9 @@ This file is high-signal context only — it points to where things live.
 ## HARD RULES (verbatim — do not violate)
 - **One feature per session.** Leave the repo mergeable (no half-finished work;
   revert rather than leave a mess).
+- **Never commit or push to `main` directly (ADR-0011).** Each session works on a
+  dedicated `feat/Fxxx-<slug>` branch and lands it via `tools/land.sh` (push → PR →
+  squash auto-merge → delete branch). Every session ends on a clean `main`.
 - **`feature_list.json` is append-only in spirit:** it is unacceptable to remove,
   rewrite, or weaken a feature — only flip `passes` to `true` after verified
   end-to-end success. New discovered requirements may be appended as new entries.
