@@ -2393,6 +2393,66 @@
         "Screenshot the secure app + a header readout."
       ],
       "passes": false
+    },
+    {
+      "id": "F206",
+      "category": "self-improve",
+      "description": "A background self-improvement daemon runs on a schedule with NO human trigger, aggregating the privacy-preserving derived-metric logs (F203) into an evaluation dataset.",
+      "steps": [
+        "Assert a scheduled job runs the self-improvement daemon without any manual/UI trigger.",
+        "Assert it reads only derived-metric records (angles/stats), never image data.",
+        "Assert it produces an aggregated evaluation dataset for the current parameters.",
+        "Screenshot the daemon status/last-run in the app."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F207",
+      "category": "self-improve",
+      "description": "The loop computes a self-supervised quality objective (temporal stability + cross-view agreement + mirror/scale invariance) with NO human labels, and tracks it over time as a rising \"analysis quality\" score.",
+      "steps": [
+        "Unit-test the objective: a noisier/less-consistent metric stream scores lower than a stable one.",
+        "Run the loop over logged data and assert a quality score is computed and stored.",
+        "Assert an in-app trend shows the quality score over successive runs.",
+        "Screenshot the quality trend."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F208",
+      "category": "self-improve",
+      "description": "The loop proposes candidate parameters (angle thresholds, One-Euro beta/mincutoff, persistence window, hysteresis) via bounded search and validates each by replaying logged sequences AND the deterministic pose_fixtures, rejecting any that regress.",
+      "steps": [
+        "Unit-test that a candidate which worsens the objective or breaks a pose_fixtures assertion is rejected.",
+        "Run the loop and assert it evaluates multiple candidates and selects the best non-regressing one.",
+        "Assert the deterministic fixtures still pass after selection.",
+        "Screenshot the candidate-evaluation summary."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F209",
+      "category": "self-improve",
+      "description": "Improvements are auto-applied with zero human intervention behind the test gate; each change writes an audit record (params before/after, objective delta, validation) viewable in-app, with automatic rollback if a later window regresses.",
+      "steps": [
+        "Trigger a scheduled run that finds an improvement and assert the new parameters are applied automatically (no human step).",
+        "Assert an audit record shows before/after params and the objective delta.",
+        "Simulate a subsequent regression and assert the loop auto-rolls-back to the prior parameters.",
+        "Screenshot the audit trail with the rollback entry."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F210",
+      "category": "self-improve",
+      "description": "Safety rails: parameters are clamped to sane bounds, a kill-switch flag can freeze auto-tuning, and the deterministic pose_fixtures are a non-overridable non-regression guardrail.",
+      "steps": [
+        "Unit-test that proposed parameters are clamped to their configured bounds.",
+        "Set the kill-switch and assert the daemon makes no changes while frozen.",
+        "Assert no applied change can make a pose_fixtures assertion fail.",
+        "Screenshot the safety/kill-switch state."
+      ],
+      "passes": false
     }
   ]
 }

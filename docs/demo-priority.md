@@ -37,6 +37,10 @@ The headline analysis engine (see `docs/posture-daemon.md`). Build in this order
   - **F201** closed-loop coaching + live quality meter
   - **F202** adaptive calibration (tilt / scale / baseline)
   - **F203** privacy-preserving derived-metrics logging (self-improve hook)
+  - **Autonomous self-improvement loop (L7) — F206–F210:** scheduled daemon that
+    self-tunes thresholds/filters against self-supervised objectives, gated by the
+    pose_fixtures (no human intervention, auto-apply + auto-rollback). See
+    `docs/self-improve-loop.md`. (Build after F203 provides logs.)
 - **Front-view scan → real findings:** F041 (wizard entry) · F042 (FRONT flow) ·
   F044 (countdown) · F048 (accept) · F053 (shoulder tilt) · F056 (knee) ·
   F063 (deficiency report) · F065 (plain-language) · F110 (session id) ·
