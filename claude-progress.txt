@@ -215,3 +215,43 @@ secure context, and the fake-camera Chromium flags (fakeCameraArgs('front')) fee
 a synthetic clip so the <video> preview can be verified headlessly. Then F034
 (MediaPipe loads) · F035 (skeleton overlay) · the F195–F203 daemon loops. Agent/
 chatbot LLM features remain BLOCKED until AKASHML_API_KEY is set.
+
+-------------------------------------------------------------------------------
+SESSION 005 — F026 (camera)  ·  2026-07-17  ·  model: claude-opus-4-8
+-------------------------------------------------------------------------------
+FEATURE: F026 — opening the wizard FRONT capture step requests camera access and
+shows the live preview once granted. First camera feature; Phase 1 (posture
+daemon) entry point. Unblocks F034 (MediaPipe loads) and F035 (skeleton overlay).
+
+WORK:
+- New standalone Angular component frontend/src/app/capture/ (Capture): on entry
+  (afterNextRender) it calls navigator.mediaDevices.getUserMedia({video:
+  {facingMode:'user'}}), pipes the MediaStream into a mirrored <video autoplay
+  playsinline muted>, and drives a state signal requesting|live|denied|error. An
+  overlay shows the pre-live/denied/error states; the video shows once live.
+  ngOnDestroy stops all tracks (no leaked camera). Wellness disclaimer visible on
+  the capture screen (data-testid="capture-disclaimer").
+- Route /scan/front → Capture (app.routes.ts), title "Front view — Newfoot".
+- Home hero gets a "Start front-view scan" CTA (routerLink, data-testid=
+  start-scan) so the step is reachable in the demo. CTA styling in app.scss.
+
+VERIFIED (browser, as a human — Playwright MCP, fake FRONT camera):
+- Navigated / → clicked Start scan → URL became /scan/front (title "Front view").
+- In page context after the fake camera started: capture-video present,
+  readyState=4 (>=2), videoWidth=320 (>0), paused=false, visible; overlay gone;
+  capture-status text "live"; disclaimer visible; window.isSecureContext=true.
+- 0 error-level console messages.
+- Screenshot: logs/screens/f026-front-capture-preview.png (live preview of the
+  synthetic front.y4m clip under the "Front view" heading + disclaimer).
+- New smoke test smoke/tests/f026-front-capture-preview.spec.ts (uses
+  fakeCameraArgs('front')) asserts URL, visible playing <video> (readyState>=2,
+  videoWidth>0, !paused), status "live", disclaimer, zero console errors. Local
+  suite GREEN (5/5: f001,f002,f004,skeleton,f026). f005 not re-run (needs a live
+  ngrok tunnel; no code touched it).
+
+FEATURE LIST: F026 → passes:true (5/210 passing).
+
+NEXT (demo-priority Phase 1): F034 — MediaPipe Pose Landmarker loads in the
+capture step ("Loading pose model…" → "Pose engine ready"), then F035 (33-landmark
+skeleton overlay canvas). Agent/chatbot LLM features remain BLOCKED until
+AKASHML_API_KEY is set.

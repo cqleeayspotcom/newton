@@ -305,7 +305,7 @@
         "Assert a <video> element becomes visible and is playing (readyState >= 2, videoWidth > 0).",
         "Take a screenshot showing the live preview."
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "F027",
