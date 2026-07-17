@@ -1,9 +1,16 @@
 # CLAUDE.md — Newfoot
 
-Camera-based **posture analysis + corrective shoe-insole recommendation** POC.
-Wellness/visualization only — **not a medical device**. A disclaimer ("Not medical
-advice — consult a healthcare professional") must be visible on analysis and
-recommendation screens.
+Camera-based **posture analysis + corrective shoe-insole recommendation** POC,
+plus an autonomous **Concierge agent** that acts on the web with real-time data
+(the hackathon's Autonomy criterion). Wellness/visualization only — **not a medical
+device**. A disclaimer ("Not medical advice — consult a healthcare professional")
+must be visible on analysis and recommendation screens.
+
+**Hackathon framing (see docs/decisions.md ADR-0008):** judged on Autonomy, Idea,
+Technical Implementation, Tool Use (**≥3 sponsor tools**), and Demo. The 3 sponsor
+tools each do real work: **Akash/AkashML** = LLM brain (agent + chatbot),
+**Zero.xyz** = the agent's real-time web tools, **Ghost** = agent memory (Postgres
+for AI agents). Optional 4th: Pomerium (secure ingress) or Akash Network hosting.
 
 **New session? Read `prompts/coding_agent.md` and follow its startup routine.**
 This file is high-signal context only — it points to where things live.
@@ -26,7 +33,9 @@ This file is high-signal context only — it points to where things live.
 - `docs/` — `research.md` (pose SOTA + metric thresholds), `insole-rules.md` (rule
   table posture+size → insole params), `decisions.md` (ADRs — read before changing
   architecture).
-- `feature_list.json` — the roadmap (165 features). Source of truth for what to build.
+- `feature_list.json` — the roadmap (194 features; F001–F165 core app, F166–F194
+  agent + 3 sponsors + landing page). Source of truth for what to build.
+- `docs/market-landing.md` — market analysis behind the landing-page features.
 - `tools/` — `db.sh`, `stl_check.js`, `expose.sh`, `pose_fixtures/`, `test_media/`.
 - `smoke/` — Playwright regression suite (one test per passing feature).
 - `prompts/` — `initializer.md`, `coding_agent.md`. `run_loop.sh` — headless loop.
@@ -67,6 +76,25 @@ This file is high-signal context only — it points to where things live.
 - Schema changes = new numbered migration + `tools/db.sh migrate`.
 - Base design tokens live in `frontend/src/styles.scss` (`--nf-*`, dark-mode aware);
   the full design system is a feature.
+
+## Sponsors, agent & identity
+- **AkashML** (`https://api.akashml.com/v1`, OpenAI-compatible, SSE): the LLM brain
+  for the Concierge agent and the chatbot. Key in `AKASHML_API_KEY` — **server-side
+  only, never in the browser**; the NestJS backend proxies it. PAID (trial credits)
+  → enforce rate limits + `max_completion_tokens`. Do not confuse with the free
+  `chat.akash.network` app (no API) or renting raw Akash Network compute (F194).
+- **Zero.xyz**: the agent's real-time web tools/APIs. Key in `ZERO_API_KEY`
+  (server-side). This is what makes the agent "act on the web with real-time data."
+- **Ghost** (Postgres for AI agents, MCP): agent memory/state, ephemeral per-session
+  DB. Uses `pg` (config via `GHOST_DATABASE_URL`); core app tables stay MySQL for now.
+- **Identity = progressive (ADR-0009, supersedes the old "no login" rule):** landing
+  page + camera analysis stay anonymous (session id); a lightweight email/lead-capture
+  gate triggers only at high intent (after ~3 free chatbot/agent messages, or to
+  receive the STL/plan). No passwords/accounts.
+- The autonomous **Concierge agent** (F166–F178) is the headline: one click after
+  analysis → agent plans (AkashML) → calls web tools (Zero) → persists state (Ghost)
+  → streams a visible activity feed. Keep it genuinely autonomous (no manual steps
+  mid-run) and bounded (step cap, cost cap).
 
 ## HARD RULES (verbatim — do not violate)
 - **One feature per session.** Leave the repo mergeable (no half-finished work;

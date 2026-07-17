@@ -1924,6 +1924,347 @@
         "Screenshot the debug overlay."
       ],
       "passes": false
+    },
+    {
+      "id": "F166",
+      "category": "sponsor-akash",
+      "description": "The backend proxies AkashML (OpenAI-compatible) chat completions with the API key kept server-side.",
+      "steps": [
+        "With AKASHML_API_KEY set, start the stack via ./init.sh.",
+        "From the browser, trigger a chat/agent action that calls the backend.",
+        "Assert a streamed AI response renders and that no API key is present in any network request the browser makes.",
+        "Screenshot the streamed response."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F167",
+      "category": "sponsor-zero",
+      "description": "The agent can call real-time web tools via the Zero.xyz gateway (key server-side) and receive live data.",
+      "steps": [
+        "Ensure ZERO_API_KEY is configured; start the stack.",
+        "Trigger an agent action that requires a live web lookup.",
+        "Assert the returned result contains fresh, real-world data (e.g. a current price or listing), not a hardcoded stub.",
+        "Screenshot the tool result in the UI."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F168",
+      "category": "sponsor-ghost",
+      "description": "Agent run state is persisted in Ghost Postgres (ephemeral per-session DB) and can be retrieved.",
+      "steps": [
+        "Run a Concierge agent flow to completion.",
+        "Reload the page for the same session id.",
+        "Assert the prior agent run/plan is retrieved and shown (state persisted in Ghost).",
+        "Screenshot the restored run."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F169",
+      "category": "agent-concierge",
+      "description": "The backend agent orchestrator runs a bounded plan/tool-call/observe loop using the AkashML brain, Zero tools, and Ghost memory.",
+      "steps": [
+        "Trigger the Concierge agent from an analysis result.",
+        "Assert the activity feed shows multiple sequential autonomous steps (plan then tool calls then result).",
+        "Assert the loop terminates with a structured plan and does not exceed its step cap.",
+        "Screenshot the completed run."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F170",
+      "category": "agent-concierge",
+      "description": "A one-click 'Get my fix' on the analysis result starts the Concierge agent with the findings and foot size and no further input.",
+      "steps": [
+        "Launch Chromium with the fake camera (--use-file-for-fake-video-capture=tools/test_media/front.y4m).",
+        "Complete a posture analysis and open the result screen.",
+        "Click 'Get my fix' and provide no further input.",
+        "Assert the agent starts and begins streaming steps automatically.",
+        "Screenshot the agent starting."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F171",
+      "category": "agent-concierge",
+      "description": "The agent fetches real-time TPU/PETG filament price and availability via Zero web tools and shows it in the plan.",
+      "steps": [
+        "Run the Concierge agent.",
+        "Assert the plan includes a filament section with a current price and availability sourced live.",
+        "Assert the value is labeled with its source/timestamp.",
+        "Screenshot the filament section."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F172",
+      "category": "agent-concierge",
+      "description": "The agent finds nearby 3D-print services or podiatrists using real-time web data and lists options.",
+      "steps": [
+        "Run the Concierge agent (optionally with a location hint).",
+        "Assert the plan lists one or more real print-service/podiatrist options with links.",
+        "Screenshot the options list."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F173",
+      "category": "agent-concierge",
+      "description": "The agent researches evidence-based corrective exercises for the detected deficiencies and cites sources.",
+      "steps": [
+        "Run the Concierge agent from a result containing at least one flagged deficiency.",
+        "Assert the plan includes tailored exercises that reference the specific deficiency.",
+        "Assert each recommendation shows a cited source link.",
+        "Screenshot the exercises section."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F174",
+      "category": "agent-concierge",
+      "description": "The agent compiles a personalized action plan plus a print/purchase quote and renders it to the user.",
+      "steps": [
+        "Run the Concierge agent to completion.",
+        "Assert a consolidated action plan renders with a total estimated cost/quote.",
+        "Screenshot the final plan."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F175",
+      "category": "agent-concierge",
+      "description": "A live agent activity feed streams each autonomous step (SSE) so the user visibly sees the agent acting on the web without manual intervention.",
+      "steps": [
+        "Trigger the Concierge agent.",
+        "Assert step entries appear incrementally (streamed), each naming the action/tool being used.",
+        "Assert no manual input is requested between steps.",
+        "Screenshot the streaming feed mid-run."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F176",
+      "category": "agent-concierge",
+      "description": "Agent memory/state is persisted to Ghost so a run is reviewable and resumable per session.",
+      "steps": [
+        "Complete an agent run, then revisit the run from the session history.",
+        "Assert the full step history and plan are shown from persisted state.",
+        "Screenshot the reviewed run."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F177",
+      "category": "error-states",
+      "description": "An agent tool failure, empty result, or timeout is handled gracefully with a partial plan and retry, not a crash.",
+      "steps": [
+        "Trigger an agent run under a simulated tool failure (e.g. a tool returning no data).",
+        "Assert the UI shows a graceful message and any partial results, plus a retry affordance.",
+        "Assert the app does not crash and the console has no unhandled errors.",
+        "Screenshot the degraded state."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F178",
+      "category": "observability",
+      "description": "An agent run log (steps, tools used, tokens, estimated cost) is surfaced in the UI and saved under logs/.",
+      "steps": [
+        "Complete an agent run.",
+        "Open the run details and assert steps, tools, token usage, and an estimated cost are shown.",
+        "Assert a corresponding log record exists under logs/.",
+        "Screenshot the run log."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F179",
+      "category": "chatbot",
+      "description": "The backend exposes an SSE chat proxy to AkashML for product Q&A with the API key server-side.",
+      "steps": [
+        "Open the chatbot and send a product question.",
+        "Assert the answer streams token-by-token (SSE).",
+        "Assert no API key appears in browser network traffic.",
+        "Screenshot the streamed answer."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F180",
+      "category": "chatbot",
+      "description": "The chat widget is grounded in the product and refuses medical advice, pointing to the disclaimer.",
+      "steps": [
+        "Ask the chatbot a product question and assert an on-topic grounded answer.",
+        "Ask a medical-diagnosis question (e.g. 'do I have a herniated disc?').",
+        "Assert it declines to diagnose and points to the not-medical disclaimer / a clinician.",
+        "Screenshot both responses."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F181",
+      "category": "chatbot",
+      "description": "The chatbot enforces rate limiting and token caps and shows a graceful error/429 state.",
+      "steps": [
+        "Send messages rapidly past the configured per-session/IP limit.",
+        "Assert a friendly rate-limit message appears (not a raw error) once the limit is hit.",
+        "Screenshot the rate-limit state."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F182",
+      "category": "landing",
+      "description": "The landing page shows a hero with a single primary CTA ('Analyze my posture — free, 60s, nothing uploaded').",
+      "steps": [
+        "Navigate to the landing page.",
+        "Assert the hero headline and a single prominent primary CTA are visible above the fold.",
+        "Click the CTA and assert it routes into the analysis flow.",
+        "Screenshot the hero."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F183",
+      "category": "landing",
+      "description": "A 'How it works' section explains the flow in three steps (Scan / See / Solve).",
+      "steps": [
+        "Navigate to the landing page and scroll to How it works.",
+        "Assert three labeled steps (Scan, See, Solve) are visible with short copy.",
+        "Screenshot the section."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F184",
+      "category": "disclaimer-legal",
+      "description": "The landing page shows a privacy banner ('your video never leaves your device') and a visible wellness/not-medical disclaimer.",
+      "steps": [
+        "Navigate to the landing page.",
+        "Assert a privacy statement that video/frames never leave the device is visible.",
+        "Assert a not-medical-advice wellness disclaimer is visible.",
+        "Screenshot both."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F185",
+      "category": "landing",
+      "description": "The landing page includes an interactive 3D insole teaser.",
+      "steps": [
+        "Navigate to the landing page and scroll to the insole teaser.",
+        "Assert a 3D canvas renders and can be rotated (drag changes the view).",
+        "Screenshot the teaser."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F186",
+      "category": "landing",
+      "description": "The landing page shows persona cards (desk workers / runners / all-day standers) and a competitor comparison table.",
+      "steps": [
+        "Navigate to the landing page.",
+        "Assert three persona cards are visible.",
+        "Assert a comparison table contrasts Newfoot with typical foot-scan competitors.",
+        "Screenshot both."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F187",
+      "category": "landing",
+      "description": "The landing page has an FAQ accordion, a testimonials/social-proof block, and a pricing/waitlist section.",
+      "steps": [
+        "Navigate to the landing page.",
+        "Expand an FAQ item and assert its answer becomes visible.",
+        "Assert a testimonials block and a pricing/waitlist section are present.",
+        "Screenshot the sections."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F188",
+      "category": "responsive-mobile",
+      "description": "On a mobile viewport the landing page is mobile-first and shows a sticky bottom CTA.",
+      "steps": [
+        "Set a mobile viewport (e.g. 390x844) and open the landing page.",
+        "Assert the layout is single-column and readable without horizontal scroll.",
+        "Assert a sticky bottom CTA stays visible while scrolling.",
+        "Screenshot the mobile view."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F189",
+      "category": "chatbot",
+      "description": "An embedded AI chatbot widget is available on the landing page.",
+      "steps": [
+        "Navigate to the landing page.",
+        "Assert a chat launcher is visible; open it.",
+        "Send a question and assert a streamed reply appears.",
+        "Screenshot the open widget."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F190",
+      "category": "lead-capture",
+      "description": "A soft email gate appears after a few free chatbot/agent messages.",
+      "steps": [
+        "Open the chatbot and send the configured number of free messages.",
+        "Assert an email-capture prompt appears before further messages are allowed.",
+        "Screenshot the gate."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F191",
+      "category": "lead-capture",
+      "description": "The user can enter an email to receive the STL and action plan, and the lead is persisted keyed by session.",
+      "steps": [
+        "From the result/plan screen, submit a valid email to receive the STL/plan.",
+        "Assert a confirmation is shown.",
+        "Assert the lead is persisted (retrievable for that session).",
+        "Screenshot the confirmation."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F192",
+      "category": "session-persistence",
+      "description": "A returning visitor can retrieve their saved insole/plan via an emailed link, without a password or account.",
+      "steps": [
+        "Open a saved-result link for an existing session.",
+        "Assert the previously generated insole/plan loads without any login step.",
+        "Screenshot the retrieved result."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F193",
+      "category": "sponsor-pomerium",
+      "description": "Optional 4th sponsor: a zero-trust HTTPS ingress (Pomerium) sits in front of the app with an access policy.",
+      "steps": [
+        "Deploy the app behind Pomerium with a policy configured.",
+        "Access the public HTTPS URL and assert the app loads over TLS through Pomerium.",
+        "Assert requests outside the policy are blocked.",
+        "Screenshot the served app."
+      ],
+      "passes": false
+    },
+    {
+      "id": "F194",
+      "category": "deploy-akash",
+      "description": "Optional: the dockerized stack is deployed to Akash Network (SDL + production frontend image) for a public HTTPS URL.",
+      "steps": [
+        "Translate docker-compose to an Akash SDL and deploy via the Akash CLI/console.",
+        "Open the resulting public HTTPS URL and assert the app shell loads.",
+        "Assert /api/health returns ok through the deployment.",
+        "Screenshot the live deployed app."
+      ],
+      "passes": false
     }
   ]
 }

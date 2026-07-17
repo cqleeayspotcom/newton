@@ -81,3 +81,49 @@ human clip dropped into `tools/test_media/` to exercise the full pipeline.
 per run (e.g. `NEWFOOT_MODEL=claude-opus-4-8 ./run_loop.sh` for harder features).
 **Consequences:** Sessions run on Fable 5 unless overridden; escalate the model
 for features that need more capability.
+
+## ADR-0008 — Autonomous "Concierge" agent + 3-sponsor stack (hackathon pivot)
+**Date:** 2026-07-17 · **Status:** accepted
+**Context:** The hackathon judging criteria (AWS Builder Loft / "Ship to Prod")
+weight **Autonomy** first ("how well does the agent act on the web using real-time
+data without manual intervention?") and require **Tool Use of ≥3 sponsor tools**.
+A static posture→insole app scores well on Idea but poorly on Autonomy.
+**Decision:** Keep the posture-analysis + insole recommendation as the product
+(the "Idea" / real-world value) and ADD an autonomous **Concierge agent** that,
+after analysis, acts on the web with real-time data in one click, no further input:
+real-time filament price/availability, local print-service/podiatrist lookup,
+evidence-based corrective exercises, and a compiled action plan + quote — streamed
+live to a visible agent activity feed. Three sponsor tools, each doing real work:
+- **Akash / AkashML** (`api.akashml.com/v1`, OpenAI-compatible, SSE) = the LLM brain.
+- **Zero.xyz** (AI-agent tool marketplace) = the agent's real-time web tools → the
+  core of the Autonomy criterion.
+- **Ghost** (Postgres for AI agents, MCP) = agent memory/state (ephemeral per-session).
+Optional 4th for margin: Pomerium (secure HTTPS ingress) or Akash Network hosting.
+**Consequences:** New backend agent orchestrator (bounded plan→tool→observe loop);
+API keys (`AKASHML_API_KEY`, `ZERO_API_KEY`) stay server-side. AkashML is PAID
+(trial credits) — enforce rate limits + `max_completion_tokens`. Ghost is Postgres,
+so agent-state persistence uses `pg` (the app's core tables can stay MySQL for now;
+revisit if we consolidate). Features appended as F166–F194.
+
+## ADR-0009 — Progressive identity instead of "no login"
+**Date:** 2026-07-17 · **Status:** accepted · **Supersedes** the §3 "No login/auth" constraint
+**Context:** Adding a sales landing page + an LLM chatbot/agent that burns paid
+AkashML credits changes the calculus: we want lead capture and abuse/cost control,
+but not to add funnel friction.
+**Decision:** No full accounts/passwords. **Progressive identity:** landing page and
+the camera analysis stay anonymous (client session id). A lightweight **email /
+lead-capture gate** triggers only at high-intent moments — after ~3 free chatbot/
+agent messages, and to receive the STL / action plan / pre-order. Returning users
+retrieve saved results via an emailed link (no password).
+**Consequences:** The old "no login" rule in CLAUDE.md is replaced by this. Leads are
+persisted keyed by session. Chatbot/agent get per-IP/session rate limits.
+
+## ADR-0010 — Akash hosting is optional; ngrok stays the default demo path
+**Date:** 2026-07-17 · **Status:** accepted
+**Context:** The 3-sponsor requirement is already met by AkashML + Zero.xyz + Ghost;
+deploying the whole stack on Akash Network adds effort (SDL, TLS, MySQL persistence).
+**Decision:** Treat Akash Network deployment (F194) + a production frontend image as
+OPTIONAL. Default demo path remains `tools/expose.sh` (ngrok HTTPS). If time allows,
+deploy to Akash for a persistent public URL and an extra "runs on the sponsor" point.
+**Consequences:** No hard dependency on Akash hosting for the demo; camera secure-
+context still satisfied by ngrok.
