@@ -12,7 +12,7 @@
         "Check the browser console and assert there are no error-level messages.",
         "Take a screenshot of the loaded home page."
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "F002",

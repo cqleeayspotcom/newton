@@ -59,3 +59,29 @@ NOTES / GOTCHAS:
   detection is NOT; use pose_fixtures for metric math. Drop a real y4m to exercise
   the full pipeline in-browser.
 - Camera requires HTTPS (secure context) — use ngrok; plain http LAN IP won't work.
+
+-------------------------------------------------------------------------------
+SESSION 001 — F001 (foundation)  ·  2026-07-17  ·  model: claude-fable-5
+-------------------------------------------------------------------------------
+FEATURE: F001 — SPA loads at root URL, title contains 'Newfoot', header + main
+visible, zero console errors.
+
+WORK:
+- Skeleton already satisfied most of F001; added data-testid="app-header" to the
+  shell header (frontend/src/app/app.html) so the header assertion is robust.
+- No backend/DB/schema changes.
+
+VERIFIED (browser, as a human):
+- ./init.sh → stack healthy (mysql healthy, backend {status:ok,db:ok}, frontend up).
+- Playwright MCP against http://localhost:4200/: title "Newfoot — posture
+  analysis & insole POC", header + main (app-shell) visible, h1 "Newfoot",
+  disclaimer visible, 0 error-level console messages.
+- Screenshot: logs/screens/f001-home-loads.png (full page — header, hero,
+  all-green status card, disclaimer footer).
+- New smoke test smoke/tests/f001-app-loads.spec.ts; full suite GREEN (2/2).
+
+FEATURE LIST: F001 → passes:true (1/165 passing).
+
+NEXT: F002 (backend reachable via /api same-origin) is nearly proven by the
+status card — verify + smoke-test it. Then F003 (deep-link refresh) which may
+need dev-server history fallback checks, F004, F006+ design system.
