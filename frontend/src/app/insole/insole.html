@@ -27,6 +27,20 @@
       </p>
     </div>
 
+    <div class="nf-insole__export" data-testid="insole-export">
+      <button
+        type="button"
+        class="nf-cta"
+        (click)="downloadStl('left')"
+        data-testid="stl-download-left"
+      >
+        ⬇ Download left insole (STL)
+      </button>
+      <p class="nf-insole__export-note">
+        Print-ready binary STL for the left foot.
+      </p>
+    </div>
+
     <div class="nf-card" data-testid="insole-spec">
       <div class="nf-card__row"><span>Size</span><b>EU {{ spec().footSizeEu }} · {{ spec().lengthMm }}×{{ spec().widthMm }} mm</b></div>
       <div class="nf-card__row"><span>Arch support</span><b>{{ spec().archHeightMm }} mm</b></div>

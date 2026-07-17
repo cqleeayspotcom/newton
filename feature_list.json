@@ -1145,7 +1145,7 @@
         "Assert a file download completes with an .stl extension and 'left' in the filename.",
         "Assert the downloaded file size is greater than 10 KB."
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "F099",

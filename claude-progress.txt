@@ -610,3 +610,33 @@ NEXT (HACKATHON DELIVERY track): STL export — F098 (watertight BINARY STL of t
 insole via STLExporter + download, validate with tools/stl_check.js) then F099
 (mirrored right-foot STL). buildInsoleGeometry already yields a watertight solid ready
 for export. LLM agent/chatbot features remain BLOCKED until AKASHML_API_KEY is set.
+
+────────────────────────────────────────────────────────────────────────────
+SESSION: F098 — Download left insole (STL)
+- New frontend/src/app/insole/insole-stl.ts: reuses the watertight solid from
+  buildInsoleGeometry (same mesh as the 3D viewer) and serialises it to a BINARY
+  STL via three/addons/exporters/STLExporter (`parse(mesh,{binary:true})` → DataView).
+  `buildInsoleStl(spec,side)` returns {bytes, triangles}; `downloadInsoleStl` wraps
+  the bytes in a `model/stl` Blob and triggers an <a download> click.
+  `insoleStlFileName` → `newfoot-insole-<side>-eu<size>.stl` (side-labelled).
+- insole.ts: added `downloadStl(side)` handler. insole.html: added a
+  data-testid="insole-export" block with the `.nf-cta` "⬇ Download left insole (STL)"
+  button + note; styled in insole.scss (.nf-insole__export).
+- VERIFIED end-to-end through the browser (real-person fake camera person.y4m): real
+  scan → live findings → /insole → clicked "Download left insole (STL)" → a file
+  download completes as `newfoot-insole-left-eu42.stl` (423,284 bytes, well over
+  10 KB). Screenshot: logs/screens/f098-stl-download.png.
+- STL VALIDATED with `node tools/stl_check.js`: triangles=8464, watertight=yes
+  (boundary=0, non-manifold=0), degenerate=0, dims L=275 W=75.3 T=10.1 mm (in range),
+  PASS. Byte length 423284 === 84 + 50×8464 (well-formed binary STL).
+- Smoke: smoke/tests/f098-stl-export-left.spec.ts (drives the scan→insole path,
+  captures the download, asserts .stl + 'left' filename, >10 KB, and binary-STL
+  structure 84+50×count). Full suite 17/17 green. 0 console errors.
+
+FEATURE LIST: F098 → passes:true (16/210 passing).
+
+NEXT (HACKATHON DELIVERY track): F099 — mirrored right-foot STL download (add a
+"Download right insole (STL)" button + label it mirrored-from-left;
+buildInsoleStl(spec,'right') already produces the mirrored watertight solid). Then
+F100 (validation badge) and resume Phase 1 daemon polish (F197–F210). LLM
+agent/chatbot features remain BLOCKED until AKASHML_API_KEY is set.

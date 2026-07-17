@@ -93,6 +93,21 @@
   }
 }
 
+.nf-insole__export {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  text-align: center;
+}
+
+.nf-insole__export-note {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--nf-fg-muted);
+}
+
 .nf-insole__empty {
   color: var(--nf-fg-muted);
 }
