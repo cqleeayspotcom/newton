@@ -185,3 +185,25 @@ compose → `deploy` → `logs`/`events` → `deployment close`. This powers F19
 **Consequences:** F194 is unblocked and buildable now. Install:
 `curl -fsSL https://raw.githubusercontent.com/baktun14/console-axi/main/install.sh | sh`.
 Rotate the Console key after the hackathon (it was pasted in chat).
+
+## ADR-0014 — Drop Ghost; use Pomerium; Zero is CLI-based; agent memory → MySQL
+**Date:** 2026-07-17 · **Status:** accepted · **Amends** ADR-0008 (3-sponsor stack)
+**Context:** Two corrections after checking the tools: (1) **Zero.xyz has no API key**
+— it's the `zero` CLI (search→fetch, agent session), free to set up, installed via
+`zero init` (skill in `~/.claude/skills`). (2) **Ghost** (Postgres for agents) is
+dropped by product decision in favor of **Pomerium** (open-source, identity-aware
+reverse proxy, no API key).
+**Decision:** The **3 sponsor tools are now Akash + Zero + Pomerium**, all usable
+without a paid/blocking key:
+- **Akash** — deploy via console-axi (`CONSOLE_API_KEY`, ADR-0013).
+- **Zero** — the agent's real-time web tools via the `zero` CLI (no key; wallet funds
+  only *paid* capabilities — free ones like hosting cost 0). Unblocks F167.
+- **Pomerium** — identity-aware reverse proxy / secure front door (config.yaml, no
+  key; `autocert` or hosted authenticate). See `docs/pomerium.md`. Features F193,
+  F204, F205 (F193 is no longer "optional").
+- **Agent memory** (was Ghost) now persists in the existing **MySQL** DB via a new
+  migration (agent_runs, plans). Features F168 (now agent-memory) and F176 updated.
+**Consequences:** `ZERO_API_KEY` and `GHOST_DATABASE_URL` are removed from config.
+Only `AKASHML_API_KEY` (the LLM brain for the agent/chatbot) remains a blocking key.
+The ≥3-sponsor Tool-Use requirement is satisfied by Akash + Zero + Pomerium even
+before the LLM brain is wired.
