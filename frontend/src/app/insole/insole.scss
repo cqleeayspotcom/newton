@@ -102,6 +102,13 @@
   text-align: center;
 }
 
+.nf-insole__export-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
 .nf-insole__export-note {
   margin: 0;
   font-size: 0.8rem;

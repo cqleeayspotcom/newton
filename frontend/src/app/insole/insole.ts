@@ -35,7 +35,7 @@ export class Insole {
     if (!Number.isNaN(n)) this.footSizeEu.set(Math.max(35, Math.min(48, n)));
   }
 
-  /** Download a print-ready binary STL of the recommended insole (F098). */
+  /** Download a print-ready binary STL of the recommended insole (F098 left / F099 right). */
   protected downloadStl(side: 'left' | 'right'): void {
     downloadInsoleStl(this.spec(), side);
   }

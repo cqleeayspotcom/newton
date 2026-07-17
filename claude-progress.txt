@@ -640,3 +640,37 @@ NEXT (HACKATHON DELIVERY track): F099 — mirrored right-foot STL download (add 
 buildInsoleStl(spec,'right') already produces the mirrored watertight solid). Then
 F100 (validation badge) and resume Phase 1 daemon polish (F197–F210). LLM
 agent/chatbot features remain BLOCKED until AKASHML_API_KEY is set.
+
+────────────────────────────────────────────────────────────────────────────
+SESSION: F099 — Download right insole (STL, mirrored from the left)
+- insole.html: split the export block into a two-button row — the existing
+  "⬇ Download left insole (STL)" plus a new "⬇ Download right insole (STL)"
+  (data-testid="stl-download-right", (click)="downloadStl('right')"). The note now
+  reads "Print-ready binary STL for each foot. The right insole is **mirrored from
+  the left model**." (data-testid="insole-export-note") — the visible mirrored label.
+- insole.scss: new .nf-insole__export-buttons flex row (wraps, centered) for the pair.
+- No new export code needed: buildInsoleStl/downloadInsoleStl (insole-stl.ts) +
+  buildInsoleGeometry (insole-mesh.ts, side:'right' mirrors across the width axis)
+  already produce the mirrored watertight solid; insoleStlFileName labels it 'right'.
+- VERIFIED end-to-end through the browser (real-person fake camera person.y4m): real
+  scan → live findings → /insole → clicked "Download right insole (STL)" → file
+  downloads as newfoot-insole-right-eu42.stl (423,284 bytes). Screenshot shows both
+  buttons + the "mirrored from the left model" note + disclaimer:
+  logs/screens/f099-stl-download-right.png.
+- STL VALIDATED with `node tools/stl_check.js`: triangles=8464, watertight=yes
+  (boundary=0, non-manifold=0), degenerate=0, dims L=275 W=75.3 T=10.1 mm (in range),
+  PASS. Byte length 423284 === 84 + 50×8464. `cmp` vs the F098 left export confirms
+  DIFFERENT bytes (same tri count) → a genuinely distinct mirrored mesh, not a copy.
+- Smoke: smoke/tests/f099-stl-export-right.spec.ts (scan→insole path; asserts the
+  'mirrored from the left model' note, captures the download, checks .stl + 'right'
+  filename, >10 KB, binary-STL structure 84+50×count). Full suite 18/18 green.
+  0 console errors.
+
+FEATURE LIST: F099 → passes:true (17/210 passing).
+
+NEXT (HACKATHON DELIVERY track): the ghost/3D/STL trio is now complete. Per
+docs/demo-priority.md, resume Phase 1 daemon polish — F197 (One-Euro temporal
+smoothing per landmark for a visibly stable skeleton), then F198 confidence
+weighting, F199 hysteresis gating, etc. F100 (per-export validation badge) is also
+available in the stl-export track. LLM agent/chatbot features remain BLOCKED until
+AKASHML_API_KEY is set.

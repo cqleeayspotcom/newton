@@ -1157,7 +1157,7 @@
         "Assert a .stl file downloads with 'right' in the filename and non-trivial size.",
         "Assert the UI labels it as mirrored from the left model."
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "F100",
