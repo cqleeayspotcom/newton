@@ -135,3 +135,40 @@ now, add screenshot+smoke), then F005 (HTTPS/secure-context via ngrok — needs 
 expose.sh tunnel up to assert window.isSecureContext). Then Phase 1 sponsors
 (F166–F168) BLOCKED until AKASHML_API_KEY / ZERO_API_KEY / GHOST_DATABASE_URL are
 in .env — implement+unit-test only, never fake to flip.
+
+-------------------------------------------------------------------------------
+SESSION 003 — F004 (foundation)  ·  2026-07-17  ·  model: claude-opus-4-8
+-------------------------------------------------------------------------------
+FEATURE: F004 — the dockerized stack serves the app end-to-end (frontend +
+backend + database, all from one docker-compose environment). Phase 0 of the
+demo-priority track.
+
+WORK (real fix, not just verify):
+- Startup verification exposed a latent stack bug: `docker compose ps` showed
+  backend + frontend as **(unhealthy)** even though init.sh/endpoints worked.
+  Root cause: both healthchecks probed `http://localhost:<port>` from inside the
+  container; `localhost` resolves to IPv6 `::1` first, but the Node servers listen
+  on IPv4 `0.0.0.0` only → wget got "Connection refused" every time.
+- Fix: point both healthchecks at `127.0.0.1` (docker-compose.yml backend :3000
+  and frontend :4200). Recreated containers → all three services now report
+  **healthy**, making this a genuinely healthy end-to-end dockerized stack.
+
+VERIFIED (browser, as a human):
+- ./init.sh → stack up; `docker compose ps` now shows backend=healthy,
+  frontend=healthy, mysql=healthy (was unhealthy x2 before the fix).
+- Playwright MCP at http://localhost:4200/: home page renders (app-root + header
+  visible); page-context fetch('/api/health') returns HTTP 200 with
+  {status:'ok', db:'ok'}; status card shows Frontend=ready, Backend=ok, Database=ok;
+  disclaimer footer visible; 0 error-level console messages.
+- Screenshot: logs/screens/f004-dockerized-stack.png (full page — status card all
+  green, disclaimer footer).
+- New smoke test smoke/tests/f004-dockerized-stack.spec.ts asserts home render,
+  /api/health 200 + db:'ok', all three status badges. Full suite GREEN (4/4).
+
+FEATURE LIST: F004 → passes:true (3/194 passing).
+
+NEXT (demo-priority Phase 0): F005 (HTTPS/secure-context via ngrok) — needs the
+tools/expose.sh tunnel live to assert window.isSecureContext===true and
+navigator.mediaDevices.getUserMedia over https. Then Phase 1 sponsors (F166-F168)
+remain BLOCKED until AKASHML_API_KEY / ZERO_API_KEY / GHOST_DATABASE_URL are set
+in .env (currently blank) — implement+unit-test only, never fake to flip.

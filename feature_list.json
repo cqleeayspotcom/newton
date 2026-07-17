@@ -48,7 +48,7 @@
         "Fetch '/api/health' and assert the JSON reports database connectivity as healthy.",
         "Take a screenshot as evidence the full stack is serving."
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "F005",
